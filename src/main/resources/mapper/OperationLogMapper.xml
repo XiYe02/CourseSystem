@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.coursesystem.mapper.OperationLogMapper">
+    
+    <!-- 结果映射 -->
+    <resultMap id="OperationLogResultMap" type="org.example.coursesystem.entity.OperationLog">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="username" column="username"/>
+        <result property="operationType" column="operation_type"/>
+        <result property="operationDescription" column="operation_description"/>
+        <result property="module" column="module"/>
+        <result property="method" column="method"/>
+        <result property="requestUrl" column="request_url"/>
+        <result property="requestParams" column="request_params"/>
+        <result property="clientIp" column="client_ip"/>
+        <result property="operationTime" column="operation_time"/>
+        <result property="result" column="result"/>
+        <result property="errorMessage" column="error_message"/>
+        <result property="executionTime" column="execution_time"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+    
+    <!-- 插入操作日志 -->
+    <insert id="insert" parameterType="org.example.coursesystem.entity.OperationLog" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO operation_log (
+            user_id, username, operation_type, operation_description, module,
+            method, request_url, request_params, client_ip, operation_time,
+            result, error_message, execution_time, create_time
+        ) VALUES (
+            #{userId}, #{username}, #{operationType}, #{operationDescription}, #{module},
+            #{method}, #{requestUrl}, #{requestParams}, #{clientIp}, #{operationTime},
+            #{result}, #{errorMessage}, #{executionTime}, #{createTime}
+        )
+    </insert>
+    
+    <!-- 根据ID查询操作日志 -->
+    <select id="findById" resultMap="OperationLogResultMap">
+        SELECT * FROM operation_log WHERE id = #{id}
+    </select>
+    
+    <!-- 查询所有操作日志 -->
+    <select id="findAll" resultMap="OperationLogResultMap">
+        SELECT * FROM operation_log ORDER BY operation_time DESC
+    </select>
+    
+    <!-- 根据用户ID查询操作日志 -->
+    <select id="findByUserId" resultMap="OperationLogResultMap">
+        SELECT * FROM operation_log WHERE user_id = #{userId} ORDER BY operation_time DESC
+    </select>
+    
+    <!-- 根据用户名查询操作日志 -->
+    <select id="findByUsername" resultMap="OperationLogResultMap">
+        SELECT * FROM operation_log WHERE username = #{username} ORDER BY operation_time DESC
+    </select>
+    
+    <!-- 根据操作类型查询操作日志 -->
+    <select id="findByOperationType" resultMap="OperationLogResultMap">
+        SELECT * FROM operation_log WHERE operation_type = #{operationType} ORDER BY operation_time DESC
+    </select>
+    
+    <!-- 根据模块查询操作日志 -->
+    <select id="findByModule" resultMap="OperationLogResultMap">
+        SELECT * FROM operation_log WHERE module = #{module} ORDER BY operation_time DESC
+    </select>
+    
+    <!-- 根据操作结果查询操作日志 -->
+    <select id="findByResult" resultMap="OperationLogResultMap">
+        SELECT * FROM operation_log WHERE result = #{result} ORDER BY operation_time DESC
+    </select>
+    
+    <!-- 根据时间范围查询操作日志 -->
+    <select id="findByTimeRange" resultMap="OperationLogResultMap">
+        SELECT * FROM operation_log 
+        WHERE operation_time BETWEEN #{startTime} AND #{endTime}
+        ORDER BY operation_time DESC
+    </select>
+    
+    <!-- 多条件查询操作日志 -->
+    <select id="findByConditions" resultMap="OperationLogResultMap">
+        SELECT * FROM operation_log
+        <where>
+            <if test="userId != null">
+                AND user_id = #{userId}
+            </if>
+            <if test="username != null and username != ''">
+                AND username LIKE CONCAT('%', #{username}, '%')
+            </if>
+            <if test="operationType != null and operationType != ''">
+                AND operation_type = #{operationType}
+            </if>
+            <if test="module != null and module != ''">
+                AND module = #{module}
+            </if>
+            <if test="result != null and result != ''">
+                AND result = #{result}
+            </if>
+            <if test="startTime != null">
+                AND operation_time >= #{startTime}
+            </if>
+            <if test="endTime != null"> <![CDATA[
+                AND operation_time <= #{endTime}]]>
+            </if>
+        </where>
+        ORDER BY operation_time DESC
+    </select>
+    
+    <!-- 分页查询操作日志 -->
+    <select id="findWithPagination" resultMap="OperationLogResultMap">
+        SELECT * FROM operation_log 
+        ORDER BY operation_time DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+    
+    <!-- 统计操作日志总数 -->
+    <select id="count" resultType="int">
+        SELECT COUNT(*) FROM operation_log
+    </select>
+    
+    <!-- 根据条件统计操作日志数量 -->
+    <select id="countByConditions" resultType="int">
+        SELECT COUNT(*) FROM operation_log
+        <where>
+            <if test="userId != null">
+                AND user_id = #{userId}
+            </if>
+            <if test="username != null and username != ''">
+                AND username LIKE CONCAT('%', #{username}, '%')
+            </if>
+            <if test="operationType != null and operationType != ''">
+                AND operation_type = #{operationType}
+            </if>
+            <if test="module != null and module != ''">
+                AND module = #{module}
+            </if>
+            <if test="result != null and result != ''">
+                AND result = #{result}
+            </if>
+            <if test="startTime != null">
+                AND operation_time >= #{startTime}
+            </if>
+            <if test="endTime != null"> <![CDATA[
+                AND operation_time <= #{endTime}]]>
+            </if>
+        </where>
+    </select>
+    
+    <!-- 删除指定时间之前的操作日志 -->
+    <select id="deleteBeforeTime" resultType="int"><![CDATA[
+        DELETE FROM operation_log WHERE operation_time < #{beforeTime}]]>
+    </select>
+    
+</mapper>

@@ -1,5 +1,6 @@
 package org.example.coursesystem.controller;
 
+import org.example.coursesystem.aspect.LogOperation;
 import org.example.coursesystem.entity.Course;
 import org.example.coursesystem.service.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,7 @@ public class CourseController {
      * 课程管理主页
      */
     @GetMapping
+    @LogOperation(operationType = "SELECT", description = "查看课程列表", module = "课程管理")
     public String index(Model model,
                        @RequestParam(value = "keyword", required = false) String keyword,
                        @RequestParam(value = "courseType", required = false) String courseType,

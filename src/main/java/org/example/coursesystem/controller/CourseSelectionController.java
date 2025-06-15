@@ -1,5 +1,6 @@
 package org.example.coursesystem.controller;
 
+import org.example.coursesystem.aspect.LogOperation;
 import org.example.coursesystem.entity.Course;
 import org.example.coursesystem.entity.CourseSelection;
 import org.example.coursesystem.entity.Semester;
@@ -54,6 +55,7 @@ public class CourseSelectionController {
      */
     @GetMapping("/student/course-selection")
     @PreAuthorize("hasRole('STUDENT')")
+    @LogOperation(operationType = "SELECT", description = "查看选课页面", module = "选课管理")
     public String studentCourseSelection(Model model, Authentication authentication) {
         // 获取当前登录学生信息
         String username = authentication.getName();
@@ -92,6 +94,7 @@ public class CourseSelectionController {
     @PostMapping("/student/course-selection/select")
     @ResponseBody
     @PreAuthorize("hasRole('STUDENT')")
+    @LogOperation(operationType = "CREATE", description = "学生选课", module = "选课管理", logParams = true)
     public ResponseEntity<Map<String, Object>> selectCourse(
             @RequestParam Long courseId,
             Authentication authentication) {

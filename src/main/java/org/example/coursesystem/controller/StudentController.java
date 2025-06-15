@@ -1,5 +1,6 @@
 package org.example.coursesystem.controller;
 
+import org.example.coursesystem.aspect.LogOperation;
 import org.example.coursesystem.entity.Student;
 import org.example.coursesystem.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,7 @@ public class StudentController {
      * 学生管理主页
      */
     @GetMapping
+    @LogOperation(operationType = "SELECT", description = "查看学生列表", module = "学生管理")
     public String index(Model model,
                        @RequestParam(value = "keyword", required = false) String keyword,
                        @RequestParam(value = "major", required = false) String major,
@@ -71,6 +73,7 @@ public class StudentController {
      * 显示添加学生页面
      */
     @GetMapping("/add")
+    @LogOperation(operationType = "SELECT", description = "显示添加学生页面", module = "学生管理")
     public String showAddForm(Model model) {
         model.addAttribute("student", new Student());
         model.addAttribute("action", "add");
@@ -81,6 +84,7 @@ public class StudentController {
      * 处理添加学生请求
      */
     @PostMapping("/add")
+    @LogOperation(operationType = "CREATE", description = "添加学生", module = "学生管理", logParams = true)
     public String addStudent(@Valid @ModelAttribute Student student,
                            BindingResult bindingResult,
                            RedirectAttributes redirectAttributes,
@@ -111,6 +115,7 @@ public class StudentController {
      * 显示编辑学生页面
      */
     @GetMapping("/edit/{id}")
+    @LogOperation(operationType = "SELECT", description = "显示编辑学生页面", module = "学生管理")
     public String showEditForm(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
         try {
             Student student = studentService.findById(id);
@@ -132,6 +137,7 @@ public class StudentController {
      * 处理编辑学生请求
      */
     @PostMapping("/edit/{id}")
+    @LogOperation(operationType = "UPDATE", description = "更新学生信息", module = "学生管理", logParams = true)
     public String editStudent(@PathVariable Long id,
                             @Valid @ModelAttribute Student student,
                             BindingResult bindingResult,
@@ -165,6 +171,7 @@ public class StudentController {
      * 显示学生详情页面
      */
     @GetMapping("/view/{id}")
+    @LogOperation(operationType = "SELECT", description = "查看学生详情", module = "学生管理")
     public String viewStudent(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
         try {
             Student student = studentService.findById(id);
@@ -186,6 +193,7 @@ public class StudentController {
      */
     @PostMapping("/delete/{id}")
     @ResponseBody
+    @LogOperation(operationType = "DELETE", description = "删除学生", module = "学生管理", logParams = true)
     public ResponseEntity<Map<String, Object>> deleteStudent(@PathVariable Long id) {
         Map<String, Object> response = new HashMap<>();
         
