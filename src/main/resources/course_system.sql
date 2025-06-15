@@ -11,7 +11,7 @@
  Target Server Version : 80037 (8.0.37)
  File Encoding         : 65001
 
- Date: 14/06/2025 23:22:45
+ Date: 15/06/2025 14:52:01
 */
 
 SET NAMES utf8mb4;
@@ -42,7 +42,7 @@ CREATE TABLE `course`  (
   INDEX `idx_course_code`(`course_code` ASC) USING BTREE,
   INDEX `idx_course_type`(`course_type` ASC) USING BTREE,
   INDEX `idx_department`(`department` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 239 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '课程信息表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 334 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '课程信息表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of course
@@ -82,7 +82,7 @@ CREATE TABLE `course_selection`  (
   CONSTRAINT `course_selection_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `student` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `course_selection_ibfk_2` FOREIGN KEY (`course_id`) REFERENCES `course` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `course_selection_ibfk_3` FOREIGN KEY (`semester_id`) REFERENCES `semester` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 382 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '选课信息表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 536 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '选课信息表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of course_selection
@@ -92,7 +92,7 @@ INSERT INTO `course_selection` VALUES (4, 2, 1, 1, '2025-06-13 20:51:43', 'COMPL
 INSERT INTO `course_selection` VALUES (5, 2, 3, 1, '2025-06-13 20:51:43', 'SELECTED', 78.00, NULL, NULL, NULL, '2025-06-13 20:51:43', '2025-06-14 18:29:29');
 INSERT INTO `course_selection` VALUES (6, 3, 4, 2, '2025-06-13 20:51:43', 'SELECTED', 88.50, NULL, NULL, NULL, '2025-06-13 20:51:43', '2025-06-14 11:44:49');
 INSERT INTO `course_selection` VALUES (380, 1, 2, 1, '2025-06-14 22:57:41', 'SELECTED', NULL, NULL, NULL, NULL, '2025-06-14 22:57:41', '2025-06-14 22:57:41');
-INSERT INTO `course_selection` VALUES (381, 1, 115, 1, '2025-06-14 22:57:48', 'SELECTED', NULL, NULL, NULL, NULL, '2025-06-14 22:57:48', '2025-06-14 22:57:48');
+INSERT INTO `course_selection` VALUES (415, 1, 117, 1, '2025-06-15 12:29:29', 'SELECTED', NULL, NULL, NULL, NULL, '2025-06-15 12:29:29', '2025-06-15 12:29:29');
 
 -- ----------------------------
 -- Table structure for operation_log
@@ -102,37 +102,40 @@ CREATE TABLE `operation_log`  (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `user_id` bigint NULL DEFAULT NULL COMMENT '操作用户ID',
   `username` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '操作用户名',
-  `operation_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '操作类型：CREATE, UPDATE, DELETE, SELECT, LOGIN, LOGOUT',
+  `operation_type` enum('CREATE','UPDATE','DELETE','SELECT','LOGIN','LOGOUT') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '操作类型',
   `operation_module` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '操作模块：USER, COURSE, ENROLLMENT等',
   `operation_description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '操作描述',
   `target_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '目标类型',
   `target_id` bigint NULL DEFAULT NULL COMMENT '目标ID',
   `request_method` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '请求方法：GET, POST, PUT, DELETE',
   `request_url` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '请求URL',
+  `request_params` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '请求参数',
+  `response_result` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '响应结果',
   `ip_address` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT 'IP地址',
+  `user_agent` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '用户代理',
   `operation_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '操作时间',
   `execution_time` bigint NULL DEFAULT NULL COMMENT '执行时间（毫秒）',
-  `status` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'SUCCESS' COMMENT '操作状态：SUCCESS, FAILURE',
+  `status` enum('SUCCESS','FAILURE','ERROR') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT 'SUCCESS' COMMENT '操作状态',
   `error_message` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '错误信息',
   `created_at` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_user_id`(`user_id` ASC) USING BTREE,
   INDEX `idx_username`(`username` ASC) USING BTREE,
-  INDEX `idx_operation_type`(`operation_type` ASC) USING BTREE,
   INDEX `idx_operation_module`(`operation_module` ASC) USING BTREE,
   INDEX `idx_operation_time`(`operation_time` ASC) USING BTREE,
-  INDEX `idx_status`(`status` ASC) USING BTREE
+  INDEX `idx_operation_type_new`(`operation_type` ASC) USING BTREE,
+  INDEX `idx_status_new`(`status` ASC) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '操作日志表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of operation_log
 -- ----------------------------
-INSERT INTO `operation_log` VALUES (1, 1, 'admin', 'LOGIN', 'USER', '管理员登录系统', 'USER', 1, 'POST', '/login', '127.0.0.1', '2025-06-14 23:20:15', 150, 'SUCCESS', NULL, '2025-06-14 23:20:15', '2025-06-14 23:20:15');
-INSERT INTO `operation_log` VALUES (2, 1, 'admin', 'CREATE', 'COURSE', '创建新课程', 'COURSE', 1, 'POST', '/admin/courses', '127.0.0.1', '2025-06-14 23:20:15', 200, 'SUCCESS', NULL, '2025-06-14 23:20:15', '2025-06-14 23:20:15');
-INSERT INTO `operation_log` VALUES (3, 2, 'teacher1', 'LOGIN', 'USER', '教师登录系统', 'USER', 2, 'POST', '/login', '192.168.1.100', '2025-06-14 23:20:15', 120, 'SUCCESS', NULL, '2025-06-14 23:20:15', '2025-06-14 23:20:15');
-INSERT INTO `operation_log` VALUES (4, 3, 'student1', 'CREATE', 'ENROLLMENT', '学生选课', 'ENROLLMENT', 1, 'POST', '/student/enroll', '192.168.1.101', '2025-06-14 23:20:15', 180, 'SUCCESS', NULL, '2025-06-14 23:20:15', '2025-06-14 23:20:15');
-INSERT INTO `operation_log` VALUES (5, 3, 'student1', 'SELECT', 'COURSE', '查看课程列表', 'COURSE', NULL, 'GET', '/student/courses', '192.168.1.101', '2025-06-14 23:20:15', 50, 'SUCCESS', NULL, '2025-06-14 23:20:15', '2025-06-14 23:20:15');
+INSERT INTO `operation_log` VALUES (1, 1, 'admin', 'LOGIN', 'USER', '管理员登录系统', 'USER', 1, 'POST', '/login', NULL, NULL, '127.0.0.1', NULL, '2025-06-14 23:20:15', 150, 'SUCCESS', NULL, '2025-06-14 23:20:15', '2025-06-14 23:26:46');
+INSERT INTO `operation_log` VALUES (2, 1, 'admin', 'CREATE', 'COURSE', '创建新课程', 'COURSE', 1, 'POST', '/admin/courses', NULL, NULL, '127.0.0.1', NULL, '2025-06-14 23:20:15', 200, 'SUCCESS', NULL, '2025-06-14 23:20:15', '2025-06-14 23:20:15');
+INSERT INTO `operation_log` VALUES (3, 2, 'teacher1', 'LOGIN', 'USER', '教师登录系统', 'USER', 2, 'POST', '/login', NULL, NULL, '192.168.1.100', NULL, '2025-06-14 23:20:15', 120, 'SUCCESS', NULL, '2025-06-14 23:20:15', '2025-06-14 23:26:46');
+INSERT INTO `operation_log` VALUES (4, 3, 'student1', 'CREATE', 'ENROLLMENT', '学生选课', 'ENROLLMENT', 1, 'POST', '/student/enroll', NULL, NULL, '192.168.1.101', NULL, '2025-06-14 23:20:15', 180, 'SUCCESS', NULL, '2025-06-14 23:20:15', '2025-06-14 23:20:15');
+INSERT INTO `operation_log` VALUES (5, 3, 'student1', 'SELECT', 'COURSE', '查看课程列表', 'COURSE', NULL, 'GET', '/student/courses', NULL, NULL, '192.168.1.101', NULL, '2025-06-14 23:20:15', 50, 'SUCCESS', NULL, '2025-06-14 23:20:15', '2025-06-14 23:26:46');
 
 -- ----------------------------
 -- Table structure for semester
@@ -155,7 +158,7 @@ CREATE TABLE `semester`  (
   UNIQUE INDEX `semester_code`(`semester_code` ASC) USING BTREE,
   INDEX `idx_semester_code`(`semester_code` ASC) USING BTREE,
   INDEX `idx_academic_year`(`academic_year` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 93 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '学期信息表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 131 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '学期信息表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of semester
@@ -188,7 +191,7 @@ CREATE TABLE `student`  (
   UNIQUE INDEX `student_number`(`student_number` ASC) USING BTREE,
   INDEX `idx_student_number`(`student_number` ASC) USING BTREE,
   INDEX `idx_major_grade`(`major` ASC, `grade` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 190 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '学生信息表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 267 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '学生信息表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of student
@@ -199,6 +202,7 @@ INSERT INTO `student` VALUES (3, '2022001001', '王五', 'MALE', '2004-03-10', '
 INSERT INTO `student` VALUES (4, '2024001004', '小谢', 'FEMALE', NULL, '18789812007', '2307480483@qq.com', '物联网', 2024, '', NULL, 'ACTIVE', '2024-11-13 22:07:42', '2025-06-14 13:06:00');
 INSERT INTO `student` VALUES (92, 'test', 'Xiye', 'FEMALE', NULL, '18789812007', '1321153456454@qq.com', '计算机科学与技术', 2024, '计科2401', NULL, 'ACTIVE', '2025-06-14 14:29:36', '2025-06-14 14:29:36');
 INSERT INTO `student` VALUES (93, '2022001002', '赵六', 'MALE', NULL, NULL, 'zhaoliu@example.com', '软件工程', 2022, '软工2202', NULL, 'ACTIVE', '2025-06-14 14:29:36', '2025-06-14 14:29:36');
+INSERT INTO `student` VALUES (218, '2024001009', '李在名', 'FEMALE', NULL, '14578921457', '45335520971@qq.com', '软件工程', 2024, '', NULL, 'ACTIVE', '2025-06-15 13:02:15', '2025-06-15 13:02:23');
 
 -- ----------------------------
 -- Table structure for system_config
@@ -216,7 +220,7 @@ CREATE TABLE `system_config`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `config_key`(`config_key` ASC) USING BTREE,
   INDEX `idx_config_key`(`config_key` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 277 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '系统配置表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 391 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '系统配置表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of system_config
@@ -252,14 +256,14 @@ CREATE TABLE `user`  (
   INDEX `idx_username`(`username` ASC) USING BTREE,
   INDEX `idx_role`(`role` ASC) USING BTREE,
   CONSTRAINT `user_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `student` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 278 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '用户表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 392 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '用户表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of user
 -- ----------------------------
-INSERT INTO `user` VALUES (1, 'admin', '$2a$10$eBG/01bQ5DSAJ.McM0AV/.iFoSRNPBS0mElnZlBsycyJ2vfaPwGLy', '系统管理员', 'admin@example.com', NULL, 'ADMIN', NULL, 'ACTIVE', '2025-06-14 22:58:07', 0, '2025-06-13 20:51:43', '2025-06-14 22:58:07');
+INSERT INTO `user` VALUES (1, 'admin', '$2a$10$eBG/01bQ5DSAJ.McM0AV/.iFoSRNPBS0mElnZlBsycyJ2vfaPwGLy', '系统管理员', 'admin@example.com', NULL, 'ADMIN', NULL, 'ACTIVE', '2025-06-15 14:50:14', 0, '2025-06-13 20:51:43', '2025-06-15 14:50:13');
 INSERT INTO `user` VALUES (2, 'teacher001', '$2a$10$eBG/01bQ5DSAJ.McM0AV/.iFoSRNPBS0mElnZlBsycyJ2vfaPwGLy', '张教授', 'zhang@example.com', NULL, 'TEACHER', NULL, 'ACTIVE', NULL, 0, '2025-06-13 20:51:43', '2025-06-13 22:13:23');
-INSERT INTO `user` VALUES (3, '2021001001', '$2a$10$eBG/01bQ5DSAJ.McM0AV/.iFoSRNPBS0mElnZlBsycyJ2vfaPwGLy', '张三', 'zhangsan@example.com', NULL, 'STUDENT', 1, 'ACTIVE', '2025-06-14 22:58:24', 0, '2025-06-13 20:51:43', '2025-06-14 22:58:24');
+INSERT INTO `user` VALUES (3, '2021001001', '$2a$10$eBG/01bQ5DSAJ.McM0AV/.iFoSRNPBS0mElnZlBsycyJ2vfaPwGLy', '张三', 'zhangsan@example.com', NULL, 'STUDENT', 1, 'ACTIVE', '2025-06-15 12:29:16', 0, '2025-06-13 20:51:43', '2025-06-15 12:29:15');
 INSERT INTO `user` VALUES (4, '2021001002', '$2a$10$eBG/01bQ5DSAJ.McM0AV/.iFoSRNPBS0mElnZlBsycyJ2vfaPwGLy', '李四', 'lisi@example.com', NULL, 'STUDENT', 2, 'ACTIVE', '2025-06-14 13:03:01', 0, '2025-06-13 20:51:43', '2025-06-14 13:03:00');
 INSERT INTO `user` VALUES (5, '2022001001', '$2a$10$eBG/01bQ5DSAJ.McM0AV/.iFoSRNPBS0mElnZlBsycyJ2vfaPwGLy', '王五', 'wangwu@example.com', NULL, 'STUDENT', 3, 'ACTIVE', NULL, 0, '2025-06-13 20:51:43', '2025-06-13 22:13:18');
 INSERT INTO `user` VALUES (6, '2022001002', '$2a$10$eBG/01bQ5DSAJ.McM0AV/.iFoSRNPBS0mElnZlBsycyJ2vfaPwGLy', '赵六', 'zhaoliu@example.com', NULL, 'STUDENT', 93, 'ACTIVE', NULL, 0, '2025-06-13 20:51:43', '2025-06-14 14:29:36');
