@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的课程 - 学生选课信息管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.3rem;
+        }
+        
+        .main-content {
+            margin-top: 2rem;
+        }
+        
+        .page-header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.3);
+        }
+        
+        .filter-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .course-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .course-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+        
+        .course-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        
+        .course-code {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .course-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .course-info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-selected {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+        }
+        
+        .status-completed {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .status-failed {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        
+        .summary-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .summary-item {
+            text-align: center;
+            padding: 1rem;
+        }
+        
+        .summary-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .summary-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .summary-credits {
+            color: #43e97b;
+        }
+        
+        .summary-gpa {
+            color: #667eea;
+        }
+        
+        .summary-courses {
+            color: #fa709a;
+        }
+        
+        .btn-download {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 0.7rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+        
+        .grade-display {
+            font-weight: 600;
+            padding: 0.2rem 0.5rem;
+            border-radius: 5px;
+        }
+        
+        .grade-excellent {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .grade-good {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .grade-average {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .grade-poor {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-graduation-cap me-2"></i>
+                学生选课系统
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/student/dashboard">
+                            <i class="fas fa-tachometer-alt me-1"></i>仪表板
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/student/course-selection">
+                            <i class="fas fa-book me-1"></i>选课
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/student/course-selection/my-courses">
+                            <i class="fas fa-list me-1"></i>我的课程
+                        </a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user me-1"></i>
+                            <span sec:authentication="name">用户</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt me-1"></i>退出登录</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container main-content">
+        <!-- 页面标题 -->
+        <div class="page-header">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-0">
+                        <i class="fas fa-list me-2"></i>
+                        我的课程
+                    </h1>
+                    <p class="mb-0 mt-2 opacity-75" th:if="${student}">
+                        学生：<span th:text="${student.name}"></span>（<span th:text="${student.studentNumber}"></span>）
+                    </p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <button class="btn btn-download" onclick="downloadCourseSummary()">
+                        <i class="fas fa-download me-2"></i>下载选课汇总
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 错误提示 -->
+        <div th:if="${error}" class="alert alert-danger" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <span th:text="${error}"></span>
+        </div>
+
+        <!-- 选课汇总统计 -->
+        <div class="summary-card" th:if="${courseSummary != null and !courseSummary.isEmpty()}">
+            <h5 class="mb-3">
+                <i class="fas fa-chart-bar me-2 text-primary"></i>
+                选课汇总统计
+            </h5>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="summary-item">
+                        <div class="summary-number summary-courses" th:text="${courseSummary.size()}">0</div>
+                        <div class="summary-label">总课程数</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="summary-item">
+                        <div class="summary-number summary-credits">0</div>
+                        <div class="summary-label">总学分</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="summary-item">
+                        <div class="summary-number summary-gpa">0.0</div>
+                        <div class="summary-label">平均绩点</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="summary-item">
+                        <div class="summary-number">0</div>
+                        <div class="summary-label">已完成课程</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 学期筛选 -->
+        <div class="filter-card">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h5 class="mb-0">
+                        <i class="fas fa-filter me-2 text-primary"></i>
+                        按学期查看
+                    </h5>
+                </div>
+                <div class="col-md-6">
+                    <form method="get" class="d-flex gap-2">
+                        <select name="semesterId" class="form-select" onchange="this.form.submit()">
+                            <option value="">选择学期</option>
+                            <option th:each="semester : ${semesters}" 
+                                    th:value="${semester.id}" 
+                                    th:text="${semester.semesterName + ' (' + semester.academicYear + ')'}"
+                                    th:selected="${selectedSemester != null and selectedSemester.id == semester.id}">
+                                学期
+                            </option>
+                        </select>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 当前学期课程 -->
+        <div th:if="${selectedSemester != null}">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0">
+                    <i class="fas fa-calendar-alt me-2 text-primary"></i>
+                    <span th:text="${selectedSemester.semesterName}"></span> 课程列表
+                </h5>
+                <span class="badge bg-primary" th:if="${selectedCourses != null}">
+                    共 <span th:text="${selectedCourses.size()}">0</span> 门课程
+                </span>
+            </div>
+
+            <div th:if="${selectedCourses != null and !selectedCourses.isEmpty()}">
+                <div class="row">
+                    <div class="col-md-6 col-lg-4" th:each="selection : ${selectedCourses}">
+                        <div class="course-card">
+                            <div class="course-title" th:text="${selection.course?.courseName}">课程名称</div>
+                            <div class="course-code" th:text="${selection.course?.courseCode}">课程代码</div>
+                            
+                            <div class="course-info">
+                                <div class="course-info-item">
+                                    <i class="fas fa-credit-card text-primary"></i>
+                                    <span th:text="${selection.course?.credits} + '学分'">学分</span>
+                                </div>
+                                <div class="course-info-item">
+                                    <i class="fas fa-clock text-warning"></i>
+                                    <span th:text="${selection.course?.hours} + '学时'">学时</span>
+                                </div>
+                                <div class="course-info-item">
+                                    <i class="fas fa-user text-info"></i>
+                                    <span th:text="${selection.course?.teacherName}">教师</span>
+                                </div>
+                            </div>
+                            
+                            <div class="course-info">
+                                <div class="course-info-item">
+                                    <i class="fas fa-calendar text-secondary"></i>
+                                    <span th:text="${#temporals.format(selection.selectionTime, 'yyyy-MM-dd')}">选课时间</span>
+                                </div>
+                                <div class="course-info-item" th:if="${selection.examTime != null}">
+                                    <i class="fas fa-clipboard-check text-danger"></i>
+                                    <span th:text="${#temporals.format(selection.examTime, 'yyyy-MM-dd HH:mm')}">考试时间</span>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="status-badge status-selected" th:if="${selection.status == 'SELECTED'}">已选</span>
+                                    <span class="status-badge status-completed" th:if="${selection.status == 'COMPLETED'}">已完成</span>
+                                    <span class="status-badge status-failed" th:if="${selection.status == 'FAILED'}">未通过</span>
+                                </div>
+                                <div th:if="${selection.grade != null}">
+                                    <span class="grade-display grade-excellent" th:if="${selection.grade >= 90}" th:text="${selection.grade}">成绩</span>
+                                    <span class="grade-display grade-good" th:if="${selection.grade >= 80 and selection.grade < 90}" th:text="${selection.grade}">成绩</span>
+                                    <span class="grade-display grade-average" th:if="${selection.grade >= 60 and selection.grade < 80}" th:text="${selection.grade}">成绩</span>
+                                    <span class="grade-display grade-poor" th:if="${selection.grade < 60}" th:text="${selection.grade}">成绩</span>
+                                </div>
+                            </div>
+                            
+                            <div th:if="${selection.gpa != null}" class="mt-2">
+                                <small class="text-muted">
+                                    绩点：<span class="fw-bold" th:text="${selection.gpa}">0.0</span>
+                                </small>
+                            </div>
+                            
+                            <div th:if="${selection.remarks != null and !selection.remarks.isEmpty()}" class="mt-2">
+                                <small class="text-muted">
+                                    <i class="fas fa-comment me-1"></i>
+                                    <span th:text="${selection.remarks}">备注</span>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div th:if="${selectedCourses == null or selectedCourses.isEmpty()}" class="empty-state">
+                <i class="fas fa-clipboard-list"></i>
+                <h5>该学期暂无选课记录</h5>
+                <p>您在该学期还没有选择任何课程</p>
+            </div>
+        </div>
+
+        <!-- 未选择学期提示 -->
+        <div th:if="${selectedSemester == null}" class="empty-state">
+            <i class="fas fa-calendar-alt"></i>
+            <h5>请选择学期</h5>
+            <p>请在上方选择一个学期来查看您的选课情况</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 下载选课汇总
+        function downloadCourseSummary() {
+            // 这里可以实现下载功能，支持Excel、PDF、Word等格式
+            const format = prompt('请选择下载格式：\n1. Excel (.xlsx)\n2. PDF (.pdf)\n3. Word (.docx)\n\n请输入数字 1、2 或 3：');
+            
+            let url = '';
+            switch(format) {
+                case '1':
+                    url = '/student/course-selection/download/excel';
+                    break;
+                case '2':
+                    url = '/student/course-selection/download/pdf';
+                    break;
+                case '3':
+                    url = '/student/course-selection/download/word';
+                    break;
+                default:
+                    alert('无效的格式选择！');
+                    return;
+            }
+            
+            // 创建下载链接
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = true;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        // 计算汇总统计
+        document.addEventListener('DOMContentLoaded', function() {
+            // 这里可以添加JavaScript来计算和显示汇总统计信息
+            // 例如总学分、平均绩点等
+        });
+    </script>
+</body>
+</html>

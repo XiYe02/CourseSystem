@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学生管理 - 学生选课信息管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            margin: 2px 0;
+            transition: all 0.3s ease;
+        }
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        .main-content {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+        }
+        .stats-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .stats-card.success {
+            background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+        }
+        .stats-card.warning {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        .stats-card.info {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 8px;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+        }
+        .table th {
+            background-color: #f8f9fa;
+            border-top: none;
+            font-weight: 600;
+        }
+        .search-form {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-inactive {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .status-graduated {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- 侧边栏 -->
+            <div class="col-md-2 sidebar p-3">
+                <h4 class="mb-4"><i class="fas fa-graduation-cap me-2"></i>管理系统</h4>
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="/dashboard">
+                        <i class="fas fa-tachometer-alt me-2"></i>仪表板
+                    </a>
+                    <a class="nav-link active" href="/admin/students">
+                        <i class="fas fa-user-graduate me-2"></i>学生管理
+                    </a>
+                    <a class="nav-link" href="/admin/courses">
+                        <i class="fas fa-book me-2"></i>课程管理
+                    </a>
+                    <a class="nav-link" href="/admin/enrollments">
+                        <i class="fas fa-clipboard-list me-2"></i>选课管理
+                    </a>
+                    <a class="nav-link" href="/admin/logs">
+                        <i class="fas fa-history me-2"></i>操作日志
+                    </a>
+                    <hr class="my-3">
+                    <a class="nav-link" href="/logout">
+                        <i class="fas fa-sign-out-alt me-2"></i>退出登录
+                    </a>
+                </nav>
+            </div>
+            
+            <!-- 主内容区 -->
+            <div class="col-md-10 main-content p-4">
+                <!-- 页面标题 -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><i class="fas fa-user-graduate me-2"></i>学生管理</h2>
+                    <div>
+                        <button class="btn btn-primary me-2" onclick="location.href='/admin/students/add'">
+                            <i class="fas fa-plus me-1"></i>添加学生
+                        </button>
+                        <button class="btn btn-danger" id="batchDeleteBtn" style="display: none;">
+                            <i class="fas fa-trash me-1"></i>批量删除
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 统计卡片 -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card stats-card">
+                            <div class="card-body text-center">
+                                <i class="fas fa-users fa-2x mb-2"></i>
+                                <h4 th:text="${totalCount}">0</h4>
+                                <p class="mb-0">总学生数</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card stats-card success">
+                            <div class="card-body text-center">
+                                <i class="fas fa-user-check fa-2x mb-2"></i>
+                                <h4 th:text="${activeCount}">0</h4>
+                                <p class="mb-0">在校学生</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card stats-card warning">
+                            <div class="card-body text-center">
+                                <i class="fas fa-user-times fa-2x mb-2"></i>
+                                <h4 th:text="${inactiveCount}">0</h4>
+                                <p class="mb-0">休学学生</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card stats-card info">
+                            <div class="card-body text-center">
+                                <i class="fas fa-graduation-cap fa-2x mb-2"></i>
+                                <h4 th:text="${graduatedCount}">0</h4>
+                                <p class="mb-0">已毕业</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 搜索表单 -->
+                <div class="search-form">
+                    <form method="get" action="/admin/students">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label class="form-label">关键词搜索</label>
+                                <input type="text" class="form-control" name="keyword" 
+                                       th:value="${keyword}" placeholder="学号、姓名、邮箱">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">专业</label>
+                                <input type="text" class="form-control" name="major" 
+                                       th:value="${major}" placeholder="专业名称">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">年级</label>
+                                <select class="form-select" name="grade">
+                                    <option value="">全部年级</option>
+                                    <option th:value="2024" th:selected="${grade == 2024}">2024级</option>
+                                    <option th:value="2023" th:selected="${grade == 2023}">2023级</option>
+                                    <option th:value="2022" th:selected="${grade == 2022}">2022级</option>
+                                    <option th:value="2021" th:selected="${grade == 2021}">2021级</option>
+                                    <option th:value="2020" th:selected="${grade == 2020}">2020级</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">状态</label>
+                                <select class="form-select" name="status">
+                                    <option value="">全部状态</option>
+                                    <option th:value="ACTIVE" th:selected="${status == 'ACTIVE'}">在校</option>
+                                    <option th:value="INACTIVE" th:selected="${status == 'INACTIVE'}">休学</option>
+                                    <option th:value="GRADUATED" th:selected="${status == 'GRADUATED'}">已毕业</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary me-2">
+                                    <i class="fas fa-search me-1"></i>搜索
+                                </button>
+                                <a href="/admin/students" class="btn btn-outline-secondary">
+                                    <i class="fas fa-redo me-1"></i>重置
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- 消息提示 -->
+                <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <span th:text="${successMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                
+                <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span th:text="${errorMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                
+                <!-- 学生列表 -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">学生列表</h5>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="selectAll">
+                            <label class="form-check-label" for="selectAll">全选</label>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th width="50"></th>
+                                        <th>学号</th>
+                                        <th>姓名</th>
+                                        <th>性别</th>
+                                        <th>专业</th>
+                                        <th>年级</th>
+                                        <th>班级</th>
+                                        <th>状态</th>
+                                        <th>联系方式</th>
+                                        <th width="200">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:if="${#lists.isEmpty(students)}">
+                                        <td colspan="10" class="text-center py-4">
+                                            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                            <p class="text-muted">暂无学生数据</p>
+                                        </td>
+                                    </tr>
+                                    <tr th:each="student : ${students}">
+                                        <td>
+                                            <input class="form-check-input student-checkbox" 
+                                                   type="checkbox" th:value="${student.id}">
+                                        </td>
+                                        <td th:text="${student.studentNumber}"></td>
+                                        <td th:text="${student.name}"></td>
+                                        <td th:text="${student.gender == 'MALE' ? '男' : '女'}"></td>
+                                        <td th:text="${student.major}"></td>
+                                        <td th:text="${student.grade}"></td>
+                                        <td th:text="${student.className}"></td>
+                                        <td>
+                                            <span th:class="'status-badge status-' + ${#strings.toLowerCase(student.status)}"
+                                                  th:text="${student.status == 'ACTIVE' ? '在校' : 
+                                                           (student.status == 'INACTIVE' ? '休学' : '已毕业')}"></span>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <small class="text-muted">手机：</small>
+                                                <span th:text="${student.phone}"></span><br>
+                                                <small class="text-muted">邮箱：</small>
+                                                <span th:text="${student.email}"></span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <a th:href="@{/admin/students/view/{id}(id=${student.id})}" 
+                                                   class="btn btn-outline-info" title="查看详情">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a th:href="@{/admin/students/edit/{id}(id=${student.id})}" 
+                                                   class="btn btn-outline-primary" title="编辑">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <button class="btn btn-outline-danger" 
+                                                        th:onclick="'deleteStudent(' + ${student.id} + ')'" title="删除">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 删除确认模态框 -->
+    <div class="modal fade" id="deleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">确认删除</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>确定要删除这个学生吗？此操作不可撤销。</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">确认删除</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 批量删除确认模态框 -->
+    <div class="modal fade" id="batchDeleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">确认批量删除</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>确定要删除选中的 <span id="selectedCount">0</span> 个学生吗？此操作不可撤销。</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-danger" id="confirmBatchDeleteBtn">确认删除</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let deleteStudentId = null;
+        
+        // 删除单个学生
+        function deleteStudent(id) {
+            deleteStudentId = id;
+            new bootstrap.Modal(document.getElementById('deleteModal')).show();
+        }
+        
+        // 确认删除
+        document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+            if (deleteStudentId) {
+                fetch(`/admin/students/delete/${deleteStudentId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('删除失败：' + data.message);
+                    }
+                })
+                .catch(error => {
+                    alert('删除失败：' + error.message);
+                });
+                
+                bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
+            }
+        });
+        
+        // 全选/取消全选
+        document.getElementById('selectAll').addEventListener('change', function() {
+            const checkboxes = document.querySelectorAll('.student-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+            updateBatchDeleteButton();
+        });
+        
+        // 监听单个复选框变化
+        document.querySelectorAll('.student-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', updateBatchDeleteButton);
+        });
+        
+        // 更新批量删除按钮状态
+        function updateBatchDeleteButton() {
+            const checkedBoxes = document.querySelectorAll('.student-checkbox:checked');
+            const batchDeleteBtn = document.getElementById('batchDeleteBtn');
+            
+            if (checkedBoxes.length > 0) {
+                batchDeleteBtn.style.display = 'inline-block';
+            } else {
+                batchDeleteBtn.style.display = 'none';
+            }
+        }
+        
+        // 批量删除
+        document.getElementById('batchDeleteBtn').addEventListener('click', function() {
+            const checkedBoxes = document.querySelectorAll('.student-checkbox:checked');
+            document.getElementById('selectedCount').textContent = checkedBoxes.length;
+            new bootstrap.Modal(document.getElementById('batchDeleteModal')).show();
+        });
+        
+        // 确认批量删除
+        document.getElementById('confirmBatchDeleteBtn').addEventListener('click', function() {
+            const checkedBoxes = document.querySelectorAll('.student-checkbox:checked');
+            const ids = Array.from(checkedBoxes).map(checkbox => parseInt(checkbox.value));
+            
+            fetch('/admin/students/batch-delete', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(ids)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('批量删除失败：' + data.message);
+                }
+            })
+            .catch(error => {
+                alert('批量删除失败：' + error.message);
+            });
+            
+            bootstrap.Modal.getInstance(document.getElementById('batchDeleteModal')).hide();
+        });
+    </script>
+</body>
+</html>

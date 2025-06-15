@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.coursesystem.mapper.StudentMapper">
+    
+    <!-- 结果映射 -->
+    <resultMap id="StudentResultMap" type="org.example.coursesystem.entity.Student">
+        <id property="id" column="id"/>
+        <result property="studentNumber" column="student_number"/>
+        <result property="name" column="name"/>
+        <result property="gender" column="gender"/>
+        <result property="birthDate" column="birth_date"/>
+        <result property="phone" column="phone"/>
+        <result property="email" column="email"/>
+        <result property="major" column="major"/>
+        <result property="grade" column="grade"/>
+        <result property="className" column="class_name"/>
+        <result property="enrollmentDate" column="enrollment_date"/>
+        <result property="status" column="status"/>
+        <result property="createdTime" column="created_time"/>
+        <result property="updatedTime" column="updated_time"/>
+    </resultMap>
+    
+    <!-- 根据ID查找学生 -->
+    <select id="findById" resultMap="StudentResultMap">
+        SELECT * FROM student WHERE id = #{id}
+    </select>
+    
+    <!-- 根据学号查找学生 -->
+    <select id="findByStudentNumber" resultMap="StudentResultMap">
+        SELECT * FROM student WHERE student_number = #{studentNumber}
+    </select>
+    
+    <!-- 查询所有学生 -->
+    <select id="findAll" resultMap="StudentResultMap">
+        SELECT * FROM student ORDER BY created_time DESC
+    </select>
+    
+    <!-- 根据专业查询学生 -->
+    <select id="findByMajor" resultMap="StudentResultMap">
+        SELECT * FROM student WHERE major = #{major} ORDER BY created_time DESC
+    </select>
+    
+    <!-- 根据年级查询学生 -->
+    <select id="findByGrade" resultMap="StudentResultMap">
+        SELECT * FROM student WHERE grade = #{grade} ORDER BY created_time DESC
+    </select>
+    
+    <!-- 根据状态查询学生 -->
+    <select id="findByStatus" resultMap="StudentResultMap">
+        SELECT * FROM student WHERE status = #{status} ORDER BY created_time DESC
+    </select>
+    
+    <!-- 模糊查询学生 -->
+    <select id="searchByKeyword" resultMap="StudentResultMap">
+        SELECT * FROM student 
+        WHERE name LIKE CONCAT('%', #{keyword}, '%') 
+           OR student_number LIKE CONCAT('%', #{keyword}, '%')
+        ORDER BY created_time DESC
+    </select>
+    
+    <!-- 插入新学生 -->
+    <insert id="insert" parameterType="org.example.coursesystem.entity.Student" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO student (
+            student_number, name, gender, birth_date, phone, email, 
+            major, grade, class_name, enrollment_date, status, 
+            created_time, updated_time
+        ) VALUES (
+            #{studentNumber}, #{name}, #{gender}, #{birthDate}, #{phone}, #{email},
+            #{major}, #{grade}, #{className}, #{enrollmentDate}, #{status},
+            #{createdTime}, #{updatedTime}
+        )
+    </insert>
+    
+    <!-- 更新学生信息 -->
+    <update id="update" parameterType="org.example.coursesystem.entity.Student">
+        UPDATE student SET
+            student_number = #{studentNumber},
+            name = #{name},
+            gender = #{gender},
+            birth_date = #{birthDate},
+            phone = #{phone},
+            email = #{email},
+            major = #{major},
+            grade = #{grade},
+            class_name = #{className},
+            enrollment_date = #{enrollmentDate},
+            status = #{status},
+            updated_time = #{updatedTime}
+        WHERE id = #{id}
+    </update>
+    
+    <!-- 根据ID删除学生 -->
+    <delete id="deleteById">
+        DELETE FROM student WHERE id = #{id}
+    </delete>
+    
+    <!-- 批量删除学生 -->
+    <delete id="deleteByIds">
+        DELETE FROM student WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+    <!-- 检查学号是否存在 -->
+    <select id="existsByStudentNumber" resultType="boolean">
+        SELECT COUNT(*) > 0 FROM student WHERE student_number = #{studentNumber}
+    </select>
+    
+    <!-- 根据状态统计学生数量 -->
+    <select id="countByStatus" resultType="int">
+        SELECT COUNT(*) FROM student WHERE status = #{status}
+    </select>
+    
+</mapper>

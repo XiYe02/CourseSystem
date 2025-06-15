@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.coursesystem.mapper.CourseSelectionMapper">
+    
+    <!-- 基础结果映射 -->
+    <resultMap id="CourseSelectionResultMap" type="org.example.coursesystem.entity.CourseSelection">
+        <id property="id" column="id"/>
+        <result property="studentId" column="student_id"/>
+        <result property="courseId" column="course_id"/>
+        <result property="semesterId" column="semester_id"/>
+        <result property="selectionTime" column="selection_time"/>
+        <result property="status" column="status"/>
+        <result property="score" column="score"/>
+        <result property="gradePoint" column="grade_point"/>
+        <result property="examTime" column="exam_time"/>
+        <result property="remarks" column="remarks"/>
+        <result property="createdTime" column="created_time"/>
+        <result property="updatedTime" column="updated_time"/>
+    </resultMap>
+    
+    <!-- 包含关联对象的结果映射 -->
+    <resultMap id="CourseSelectionWithDetailsResultMap" type="org.example.coursesystem.entity.CourseSelection" extends="CourseSelectionResultMap">
+        <association property="student" javaType="org.example.coursesystem.entity.Student">
+            <id property="id" column="s_id"/>
+            <result property="studentNumber" column="s_student_number"/>
+            <result property="name" column="s_name"/>
+            <result property="gender" column="s_gender"/>
+            <result property="major" column="s_major"/>
+            <result property="grade" column="s_grade"/>
+            <result property="className" column="s_class_name"/>
+        </association>
+        <association property="course" javaType="org.example.coursesystem.entity.Course">
+            <id property="id" column="c_id"/>
+            <result property="courseCode" column="c_course_code"/>
+            <result property="courseName" column="c_course_name"/>
+            <result property="credits" column="c_credits"/>
+            <result property="hours" column="c_hours"/>
+            <result property="courseType" column="c_course_type"/>
+            <result property="teacherName" column="c_teacher_name"/>
+        </association>
+        <association property="semester" javaType="org.example.coursesystem.entity.Semester">
+            <id property="id" column="sem_id"/>
+            <result property="semesterCode" column="sem_semester_code"/>
+            <result property="semesterName" column="sem_semester_name"/>
+            <result property="academicYear" column="sem_academic_year"/>
+        </association>
+    </resultMap>
+    
+    <!-- 查询所有选课记录 -->
+    <select id="findAll" resultMap="CourseSelectionResultMap">
+        SELECT * FROM course_selection ORDER BY selection_time DESC
+    </select>
+    
+    <!-- 根据ID查询选课记录 -->
+    <select id="findById" resultMap="CourseSelectionResultMap">
+        SELECT * FROM course_selection WHERE id = #{id}
+    </select>
+    
+    <!-- 根据学生ID查询选课记录 -->
+    <select id="findByStudentId" resultMap="CourseSelectionResultMap">
+        SELECT * FROM course_selection WHERE student_id = #{studentId} ORDER BY selection_time DESC
+    </select>
+    
+    <!-- 根据课程ID查询选课记录 -->
+    <select id="findByCourseId" resultMap="CourseSelectionResultMap">
+        SELECT * FROM course_selection WHERE course_id = #{courseId} ORDER BY selection_time DESC
+    </select>
+    
+    <!-- 根据学期ID查询选课记录 -->
+    <select id="findBySemesterId" resultMap="CourseSelectionResultMap">
+        SELECT * FROM course_selection WHERE semester_id = #{semesterId} ORDER BY selection_time DESC
+    </select>
+    
+    <!-- 根据学生ID和学期ID查询选课记录 -->
+    <select id="findByStudentAndSemester" resultMap="CourseSelectionResultMap">
+        SELECT * FROM course_selection 
+        WHERE student_id = #{studentId} AND semester_id = #{semesterId}
+        ORDER BY selection_time DESC
+    </select>
+    
+    <!-- 根据课程ID和学期ID查询选课记录 -->
+    <select id="findByCourseAndSemester" resultMap="CourseSelectionResultMap">
+        SELECT * FROM course_selection 
+        WHERE course_id = #{courseId} AND semester_id = #{semesterId}
+        ORDER BY selection_time DESC
+    </select>
+    
+    <!-- 查询学生在指定学期的选课记录（包含课程和学期信息） -->
+    <select id="findStudentCoursesWithDetails" resultMap="CourseSelectionWithDetailsResultMap">
+        SELECT 
+            cs.*,
+            c.id as c_id, c.course_code as c_course_code, c.course_name as c_course_name,
+            c.credits as c_credits, c.hours as c_hours, c.course_type as c_course_type,
+            c.teacher_name as c_teacher_name,
+            sem.id as sem_id, sem.semester_code as sem_semester_code, 
+            sem.semester_name as sem_semester_name, sem.academic_year as sem_academic_year
+        FROM course_selection cs
+        LEFT JOIN course c ON cs.course_id = c.id
+        LEFT JOIN semester sem ON cs.semester_id = sem.id
+        WHERE cs.student_id = #{studentId} AND cs.semester_id = #{semesterId}
+        ORDER BY cs.selection_time DESC
+    </select>
+    
+    <!-- 查询课程在指定学期的选课记录（包含学生信息） -->
+    <select id="findCourseStudentsWithDetails" resultMap="CourseSelectionWithDetailsResultMap">
+        SELECT 
+            cs.*,
+            s.id as s_id, s.student_number as s_student_number, s.name as s_name,
+            s.gender as s_gender, s.major as s_major, s.grade as s_grade, s.class_name as s_class_name,
+            sem.id as sem_id, sem.semester_code as sem_semester_code, 
+            sem.semester_name as sem_semester_name, sem.academic_year as sem_academic_year
+        FROM course_selection cs
+        LEFT JOIN student s ON cs.student_id = s.id
+        LEFT JOIN semester sem ON cs.semester_id = sem.id
+        WHERE cs.course_id = #{courseId} AND cs.semester_id = #{semesterId}
+        ORDER BY cs.selection_time DESC
+    </select>
+    
+    <!-- 查询所有选课记录（包含学生、课程、学期信息） -->
+    <select id="findAllWithDetails" resultMap="CourseSelectionWithDetailsResultMap">
+        SELECT 
+            cs.*,
+            s.id as s_id, s.student_number as s_student_number, s.name as s_name,
+            s.gender as s_gender, s.major as s_major, s.grade as s_grade, s.class_name as s_class_name,
+            c.id as c_id, c.course_code as c_course_code, c.course_name as c_course_name,
+            c.credits as c_credits, c.hours as c_hours, c.course_type as c_course_type,
+            c.teacher_name as c_teacher_name,
+            sem.id as sem_id, sem.semester_code as sem_semester_code, 
+            sem.semester_name as sem_semester_name, sem.academic_year as sem_academic_year
+        FROM course_selection cs
+        LEFT JOIN student s ON cs.student_id = s.id
+        LEFT JOIN course c ON cs.course_id = c.id
+        LEFT JOIN semester sem ON cs.semester_id = sem.id
+        ORDER BY cs.selection_time DESC
+    </select>
+    
+    <!-- 根据状态查询选课记录 -->
+    <select id="findByStatus" resultMap="CourseSelectionResultMap">
+        SELECT * FROM course_selection WHERE status = #{status} ORDER BY selection_time DESC
+    </select>
+    
+    <!-- 根据状态查询选课记录（包含学生、课程、学期信息） -->
+    <select id="findByStatusWithDetails" resultMap="CourseSelectionWithDetailsResultMap">
+        SELECT 
+            cs.*,
+            s.id as s_id, s.student_number as s_student_number, s.name as s_name,
+            s.gender as s_gender, s.major as s_major, s.grade as s_grade, s.class_name as s_class_name,
+            c.id as c_id, c.course_code as c_course_code, c.course_name as c_course_name,
+            c.credits as c_credits, c.hours as c_hours, c.course_type as c_course_type,
+            c.teacher_name as c_teacher_name,
+            sem.id as sem_id, sem.semester_code as sem_semester_code, 
+            sem.semester_name as sem_semester_name, sem.academic_year as sem_academic_year
+        FROM course_selection cs
+        LEFT JOIN student s ON cs.student_id = s.id
+        LEFT JOIN course c ON cs.course_id = c.id
+        LEFT JOIN semester sem ON cs.semester_id = sem.id
+        WHERE cs.status = #{status}
+        ORDER BY cs.selection_time DESC
+    </select>
+    
+    <!-- 根据学生关键词查询选课记录（包含学生、课程、学期信息） -->
+    <select id="findByStudentKeywordWithDetails" resultMap="CourseSelectionWithDetailsResultMap">
+        SELECT 
+            cs.*,
+            s.id as s_id, s.student_number as s_student_number, s.name as s_name,
+            s.gender as s_gender, s.major as s_major, s.grade as s_grade, s.class_name as s_class_name,
+            c.id as c_id, c.course_code as c_course_code, c.course_name as c_course_name,
+            c.credits as c_credits, c.hours as c_hours, c.course_type as c_course_type,
+            c.teacher_name as c_teacher_name,
+            sem.id as sem_id, sem.semester_code as sem_semester_code, 
+            sem.semester_name as sem_semester_name, sem.academic_year as sem_academic_year
+        FROM course_selection cs
+        LEFT JOIN student s ON cs.student_id = s.id
+        LEFT JOIN course c ON cs.course_id = c.id
+        LEFT JOIN semester sem ON cs.semester_id = sem.id
+        WHERE (s.student_number LIKE CONCAT('%', #{keyword}, '%') OR s.name LIKE CONCAT('%', #{keyword}, '%'))
+        ORDER BY cs.selection_time DESC
+    </select>
+    
+    <!-- 根据课程关键词查询选课记录（包含学生、课程、学期信息） -->
+    <select id="findByCourseKeywordWithDetails" resultMap="CourseSelectionWithDetailsResultMap">
+        SELECT 
+            cs.*,
+            s.id as s_id, s.student_number as s_student_number, s.name as s_name,
+            s.gender as s_gender, s.major as s_major, s.grade as s_grade, s.class_name as s_class_name,
+            c.id as c_id, c.course_code as c_course_code, c.course_name as c_course_name,
+            c.credits as c_credits, c.hours as c_hours, c.course_type as c_course_type,
+            c.teacher_name as c_teacher_name,
+            sem.id as sem_id, sem.semester_code as sem_semester_code, 
+            sem.semester_name as sem_semester_name, sem.academic_year as sem_academic_year
+        FROM course_selection cs
+        LEFT JOIN student s ON cs.student_id = s.id
+        LEFT JOIN course c ON cs.course_id = c.id
+        LEFT JOIN semester sem ON cs.semester_id = sem.id
+        WHERE (c.course_code LIKE CONCAT('%', #{keyword}, '%') OR c.course_name LIKE CONCAT('%', #{keyword}, '%'))
+        ORDER BY cs.selection_time DESC
+    </select>
+    
+    <!-- 根据学生ID查询选课记录（包含课程、学期信息） -->
+    <select id="findByStudentIdWithDetails" resultMap="CourseSelectionWithDetailsResultMap">
+        SELECT 
+            cs.*,
+            c.id as c_id, c.course_code as c_course_code, c.course_name as c_course_name,
+            c.credits as c_credits, c.hours as c_hours, c.course_type as c_course_type,
+            c.teacher_name as c_teacher_name,
+            sem.id as sem_id, sem.semester_code as sem_semester_code, 
+            sem.semester_name as sem_semester_name, sem.academic_year as sem_academic_year
+        FROM course_selection cs
+        LEFT JOIN course c ON cs.course_id = c.id
+        LEFT JOIN semester sem ON cs.semester_id = sem.id
+        WHERE cs.student_id = #{studentId}
+        ORDER BY cs.selection_time DESC
+    </select>
+    
+    <!-- 根据课程ID查询选课记录（包含学生、学期信息） -->
+    <select id="findByCourseIdWithDetails" resultMap="CourseSelectionWithDetailsResultMap">
+        SELECT 
+            cs.*,
+            s.id as s_id, s.student_number as s_student_number, s.name as s_name,
+            s.gender as s_gender, s.major as s_major, s.grade as s_grade, s.class_name as s_class_name,
+            sem.id as sem_id, sem.semester_code as sem_semester_code, 
+            sem.semester_name as sem_semester_name, sem.academic_year as sem_academic_year
+        FROM course_selection cs
+        LEFT JOIN student s ON cs.student_id = s.id
+        LEFT JOIN semester sem ON cs.semester_id = sem.id
+        WHERE cs.course_id = #{courseId}
+        ORDER BY cs.selection_time DESC
+    </select>
+    
+    <!-- 根据学期ID查询选课记录（包含学生、课程信息） -->
+    <select id="findBySemesterIdWithDetails" resultMap="CourseSelectionWithDetailsResultMap">
+        SELECT 
+            cs.*,
+            s.id as s_id, s.student_number as s_student_number, s.name as s_name,
+            s.gender as s_gender, s.major as s_major, s.grade as s_grade, s.class_name as s_class_name,
+            c.id as c_id, c.course_code as c_course_code, c.course_name as c_course_name,
+            c.credits as c_credits, c.hours as c_hours, c.course_type as c_course_type,
+            c.teacher_name as c_teacher_name,
+            sem.id as sem_id, sem.semester_code as sem_semester_code, 
+            sem.semester_name as sem_semester_name, sem.academic_year as sem_academic_year
+        FROM course_selection cs
+        LEFT JOIN student s ON cs.student_id = s.id
+        LEFT JOIN course c ON cs.course_id = c.id
+        LEFT JOIN semester sem ON cs.semester_id = sem.id
+        WHERE cs.semester_id = #{semesterId}
+        ORDER BY cs.selection_time DESC
+    </select>
+    
+    <!-- 查询学生选课汇总信息（按学期） -->
+    <select id="findStudentCourseSummary" resultType="map">
+        SELECT 
+            COUNT(*) as totalCourses,
+            SUM(CASE WHEN cs.status = 'COMPLETED' THEN c.credits ELSE 0 END) as completedCredits,
+            SUM(c.credits) as totalCredits,
+            AVG(CASE WHEN cs.score IS NOT NULL THEN cs.score ELSE NULL END) as averageScore,
+            COUNT(CASE WHEN cs.status = 'SELECTED' THEN 1 END) as selectedCourses,
+            COUNT(CASE WHEN cs.status = 'COMPLETED' THEN 1 END) as completedCourses,
+            COUNT(CASE WHEN cs.status = 'DROPPED' THEN 1 END) as droppedCourses
+        FROM course_selection cs
+        LEFT JOIN course c ON cs.course_id = c.id
+        WHERE cs.student_id = #{studentId}
+        AND cs.semester_id = #{semesterId}
+    </select>
+    
+    <!-- 查询学生选课汇总信息（所有学期） -->
+    <select id="findStudentCourseSummaryAll" resultType="map">
+        SELECT 
+            COUNT(*) as totalCourses,
+            SUM(CASE WHEN cs.status = 'COMPLETED' THEN c.credits ELSE 0 END) as completedCredits,
+            SUM(c.credits) as totalCredits,
+            AVG(CASE WHEN cs.score IS NOT NULL THEN cs.score ELSE NULL END) as averageScore,
+            COUNT(CASE WHEN cs.status = 'SELECTED' THEN 1 END) as selectedCourses,
+            COUNT(CASE WHEN cs.status = 'COMPLETED' THEN 1 END) as completedCourses,
+            COUNT(CASE WHEN cs.status = 'DROPPED' THEN 1 END) as droppedCourses
+        FROM course_selection cs
+        LEFT JOIN course c ON cs.course_id = c.id
+        WHERE cs.student_id = #{studentId}
+    </select>
+    
+    <!-- 插入选课记录 -->
+    <insert id="insert" parameterType="org.example.coursesystem.entity.CourseSelection" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO course_selection (
+            student_id, course_id, semester_id, selection_time, status,
+            score, grade_point, exam_time, remarks, created_time, updated_time
+        ) VALUES (
+            #{studentId}, #{courseId}, #{semesterId}, #{selectionTime}, #{status},
+            #{score}, #{gradePoint}, #{examTime}, #{remarks}, #{createdTime}, #{updatedTime}
+        )
+    </insert>
+    
+    <!-- 更新选课记录 -->
+    <update id="update" parameterType="org.example.coursesystem.entity.CourseSelection">
+        UPDATE course_selection SET
+            student_id = #{studentId},
+            course_id = #{courseId},
+            semester_id = #{semesterId},
+            selection_time = #{selectionTime},
+            status = #{status},
+            score = #{score},
+            grade_point = #{gradePoint},
+            exam_time = #{examTime},
+            remarks = #{remarks},
+            updated_time = #{updatedTime}
+        WHERE id = #{id}
+    </update>
+    
+    <!-- 删除选课记录 -->
+    <delete id="deleteById">
+        DELETE FROM course_selection WHERE id = #{id}
+    </delete>
+    
+    <!-- 批量删除选课记录 -->
+    <delete id="deleteByIds">
+        DELETE FROM course_selection WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+    <!-- 根据学生ID删除选课记录 -->
+    <delete id="deleteByStudentId">
+        DELETE FROM course_selection WHERE student_id = #{studentId}
+    </delete>
+    
+    <!-- 根据课程ID删除选课记录 -->
+    <delete id="deleteByCourseId">
+        DELETE FROM course_selection WHERE course_id = #{courseId}
+    </delete>
+    
+    <!-- 检查学生是否已选择指定课程 -->
+    <select id="existsByStudentAndCourse" resultType="boolean">
+        SELECT COUNT(*) > 0 FROM course_selection 
+        WHERE student_id = #{studentId} 
+          AND course_id = #{courseId} 
+          AND semester_id = #{semesterId}
+          AND status != 'DROPPED'
+    </select>
+    
+    <!-- 检查学生是否已选择指定课程（Service中使用的方法名） -->
+    <select id="isStudentSelectedCourse" resultType="boolean">
+        SELECT COUNT(*) > 0 FROM course_selection 
+        WHERE student_id = #{studentId} 
+          AND course_id = #{courseId} 
+          AND semester_id = #{semesterId}
+          AND status != 'DROPPED'
+    </select>
+    
+    <!-- 统计学生在指定学期的选课数量 -->
+    <select id="countByStudentAndSemester" resultType="long">
+        SELECT COUNT(*) FROM course_selection 
+        WHERE student_id = #{studentId} 
+          AND semester_id = #{semesterId}
+          AND status != 'DROPPED'
+    </select>
+    
+    <!-- 统计学生选课数量（Service中使用的方法名） -->
+    <select id="countStudentSelections" resultType="long">
+        SELECT COUNT(*) FROM course_selection 
+        WHERE student_id = #{studentId} 
+          AND semester_id = #{semesterId}
+          AND status != 'DROPPED'
+    </select>
+    
+    <!-- 统计课程在指定学期的选课人数 -->
+    <select id="countByCourseAndSemester" resultType="long">
+        SELECT COUNT(*) FROM course_selection 
+        WHERE course_id = #{courseId} 
+          AND semester_id = #{semesterId}
+          AND status != 'DROPPED'
+    </select>
+    
+    <!-- 统计课程选课人数（Service中使用的方法名） -->
+    <select id="countCourseSelections" resultType="long">
+        SELECT COUNT(*) FROM course_selection 
+        WHERE course_id = #{courseId} 
+          AND semester_id = #{semesterId}
+          AND status != 'DROPPED'
+    </select>
+    
+    <!-- 统计选课总数 -->
+    <select id="count" resultType="long">
+        SELECT COUNT(*) FROM course_selection
+    </select>
+    
+    <!-- 根据条件统计选课数量 -->
+    <select id="countByCondition" resultType="long">
+        SELECT COUNT(*) FROM course_selection
+        <where>
+            <if test="studentId != null">
+                AND student_id = #{studentId}
+            </if>
+            <if test="courseId != null">
+                AND course_id = #{courseId}
+            </if>
+            <if test="semesterId != null">
+                AND semester_id = #{semesterId}
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+    </select>
+    
+</mapper>

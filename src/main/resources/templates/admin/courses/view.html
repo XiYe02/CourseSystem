@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>课程详情 - 学生选课信息管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            margin: 2px 0;
+            transition: all 0.3s ease;
+        }
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        .main-content {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 8px;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+        }
+        .info-section {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+        .section-title {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+        .info-item {
+            display: flex;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #495057;
+            min-width: 120px;
+            margin-right: 15px;
+        }
+        .info-value {
+            color: #6c757d;
+            flex: 1;
+        }
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-inactive {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .type-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        .type-required {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+        }
+        .type-elective {
+            background: linear-gradient(135deg, #feca57 0%, #ff9ff3 100%);
+            color: white;
+        }
+        .type-public {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- 侧边栏 -->
+            <div class="col-md-2 sidebar p-3">
+                <h4 class="mb-4">
+                    <i class="fas fa-graduation-cap me-2"></i>
+                    管理系统
+                </h4>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/dashboard">
+                            <i class="fas fa-tachometer-alt me-2"></i>仪表板
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/students">
+                            <i class="fas fa-users me-2"></i>学生管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/admin/courses">
+                            <i class="fas fa-book me-2"></i>课程管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/semesters">
+                            <i class="fas fa-calendar-alt me-2"></i>学期管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/course-selections">
+                            <i class="fas fa-clipboard-list me-2"></i>选课管理
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 主内容区 -->
+            <div class="col-md-10 main-content p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>
+                        <i class="fas fa-book me-2"></i>
+                        课程详情
+                    </h2>
+                    <div>
+                        <a th:href="@{/admin/courses/edit/{id}(id=${course.id})}" class="btn btn-warning me-2">
+                            <i class="fas fa-edit me-2"></i>编辑课程
+                        </a>
+                        <a href="/admin/courses" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>返回列表
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 基本信息 -->
+                <div class="info-section">
+                    <h5 class="section-title">
+                        <i class="fas fa-info-circle me-2"></i>基本信息
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <span class="info-label">课程代码：</span>
+                                <span class="info-value fw-bold" th:text="${course.courseCode}">CS101</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">课程名称：</span>
+                                <span class="info-value fw-bold" th:text="${course.courseName}">数据结构与算法</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">课程类型：</span>
+                                <span class="info-value">
+                                    <span class="type-badge type-required" th:if="${course.courseType == 'REQUIRED'}">必修课</span>
+                                    <span class="type-badge type-elective" th:if="${course.courseType == 'ELECTIVE'}">选修课</span>
+                                    <span class="type-badge type-public" th:if="${course.courseType == 'PUBLIC'}">公共课</span>
+                                </span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">学分：</span>
+                                <span class="info-value fw-bold" th:text="${course.credits}">4.0</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">学时：</span>
+                                <span class="info-value" th:text="${course.hours}">64</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <span class="info-label">开课院系：</span>
+                                <span class="info-value" th:text="${course.department ?: '未设置'}">计算机学院</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">授课教师：</span>
+                                <span class="info-value" th:text="${course.teacherName ?: '未设置'}">张教授</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">教师职称：</span>
+                                <span class="info-value" th:text="${course.teacherTitle ?: '未设置'}">教授</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">最大选课人数：</span>
+                                <span class="info-value" th:text="${course.maxStudents ?: '未限制'}">120</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">课程状态：</span>
+                                <span class="info-value">
+                                    <span class="status-badge status-active" th:if="${course.status == 'ACTIVE'}">启用</span>
+                                    <span class="status-badge status-inactive" th:if="${course.status == 'INACTIVE'}">停用</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 课程描述 -->
+                <div class="info-section" th:if="${course.description}">
+                    <h5 class="section-title">
+                        <i class="fas fa-file-text me-2"></i>课程描述
+                    </h5>
+                    <p class="mb-0" th:text="${course.description}">介绍基本的数据结构和算法设计与分析</p>
+                </div>
+
+                <!-- 先修课程 -->
+                <div class="info-section" th:if="${course.prerequisites}">
+                    <h5 class="section-title">
+                        <i class="fas fa-list-ul me-2"></i>先修课程
+                    </h5>
+                    <p class="mb-0" th:text="${course.prerequisites}">高等数学、离散数学</p>
+                </div>
+
+                <!-- 时间信息 -->
+                <div class="info-section">
+                    <h5 class="section-title">
+                        <i class="fas fa-clock me-2"></i>时间信息
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <span class="info-label">创建时间：</span>
+                                <span class="info-value" th:text="${#temporals.format(course.createdTime, 'yyyy-MM-dd HH:mm:ss')}">2024-01-01 10:00:00</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <span class="info-label">更新时间：</span>
+                                <span class="info-value" th:text="${#temporals.format(course.updatedTime, 'yyyy-MM-dd HH:mm:ss')}">2024-01-01 10:00:00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 操作按钮 -->
+                <div class="d-flex justify-content-end gap-2">
+                    <a th:href="@{/admin/courses/edit/{id}(id=${course.id})}" class="btn btn-warning">
+                        <i class="fas fa-edit me-2"></i>编辑课程
+                    </a>
+                    <button type="button" class="btn btn-danger" 
+                            onclick="deleteCourse(this)" 
+                            th:data-id="${course.id}" 
+                            th:data-name="${course.courseName}">
+                        <i class="fas fa-trash me-2"></i>删除课程
+                    </button>
+                    <a href="/admin/courses" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>返回列表
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function deleteCourse(button) {
+            const courseId = button.getAttribute('data-id');
+            const courseName = button.getAttribute('data-name');
+            
+            if (confirm(`确定要删除课程「${courseName}」吗？此操作不可恢复！`)) {
+                fetch(`/admin/courses/delete/${courseId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('课程删除成功！');
+                        window.location.href = '/admin/courses';
+                    } else {
+                        alert('删除失败：' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('删除失败，请重试！');
+                });
+            }
+        }
+    </script>
+</body>
+</html>

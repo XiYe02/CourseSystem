@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学期管理 - 学生选课信息管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.3rem;
+        }
+        
+        .main-content {
+            margin-top: 2rem;
+        }
+        
+        .page-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .filter-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .stats-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .stat-total {
+            color: #667eea;
+        }
+        
+        .stat-current {
+            color: #43e97b;
+        }
+        
+        .stat-upcoming {
+            color: #feca57;
+        }
+        
+        .stat-past {
+            color: #fa709a;
+        }
+        
+        .semester-table {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .table {
+            margin-bottom: 0;
+        }
+        
+        .table th {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            font-weight: 600;
+            color: #495057;
+            padding: 1rem 0.75rem;
+        }
+        
+        .table td {
+            padding: 1rem 0.75rem;
+            vertical-align: middle;
+        }
+        
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 25px;
+            padding: 0.5rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            border: none;
+            border-radius: 25px;
+            padding: 0.5rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(67, 233, 123, 0.4);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #feca57 0%, #ff9ff3 100%);
+            border: none;
+            border-radius: 25px;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(254, 202, 87, 0.4);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border: none;
+            border-radius: 25px;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(240, 147, 251, 0.4);
+        }
+        
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-current {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+        }
+        
+        .status-upcoming {
+            background: linear-gradient(135deg, #feca57 0%, #ff9ff3 100%);
+            color: white;
+        }
+        
+        .status-past {
+            background: linear-gradient(135deg, #fa709a 0%, #f093fb 100%);
+            color: white;
+        }
+        
+        .status-inactive {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+        }
+        
+        .type-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .type-spring {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+        }
+        
+        .type-fall {
+            background: linear-gradient(135deg, #feca57 0%, #ff9ff3 100%);
+            color: white;
+        }
+        
+        .type-summer {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+        
+        .type-winter {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .pagination {
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        
+        .page-link {
+            border-radius: 10px;
+            margin: 0 2px;
+            border: none;
+            color: #667eea;
+        }
+        
+        .page-link:hover {
+            background-color: #667eea;
+            color: white;
+        }
+        
+        .page-item.active .page-link {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+        
+        .search-box {
+            border-radius: 25px;
+            border: 2px solid #e9ecef;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .search-box:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        .current-semester {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-graduation-cap me-2"></i>
+                管理员系统
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/dashboard">
+                            <i class="fas fa-tachometer-alt me-1"></i>仪表板
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/students">
+                            <i class="fas fa-users me-1"></i>学生管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/courses">
+                            <i class="fas fa-book me-1"></i>课程管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/admin/semesters">
+                            <i class="fas fa-calendar-alt me-1"></i>学期管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/course-selections">
+                            <i class="fas fa-clipboard-list me-1"></i>选课管理
+                        </a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user me-1"></i>
+                            <span sec:authentication="name">管理员</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt me-1"></i>退出登录</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container main-content">
+        <!-- 页面标题 -->
+        <div class="page-header">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-0">
+                        <i class="fas fa-calendar-alt me-2"></i>
+                        学期管理
+                    </h1>
+                    <p class="mb-0 mt-2 opacity-75">管理系统中的所有学期信息</p>
+                    <div th:if="${currentSemester}" class="mt-3">
+                        <div class="current-semester">
+                            <i class="fas fa-star me-2"></i>
+                            当前学期：<span th:text="${currentSemester.semesterName + ' (' + currentSemester.academicYear + ')'}"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-end">
+                    <a href="/admin/semesters/add" class="btn btn-success">
+                        <i class="fas fa-plus me-2"></i>添加学期
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 成功提示 -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- 错误提示 -->
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- 统计卡片 -->
+        <div class="stats-card" th:if="${stats != null}">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="stat-item">
+                        <div class="stat-number stat-total" th:text="${stats.totalSemesters ?: 0}">0</div>
+                        <div class="stat-label">总学期数</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-item">
+                        <div class="stat-number stat-current" th:text="${stats.currentSemesters ?: 0}">0</div>
+                        <div class="stat-label">当前学期</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-item">
+                        <div class="stat-number stat-upcoming" th:text="${stats.upcomingSemesters ?: 0}">0</div>
+                        <div class="stat-label">即将开始</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-item">
+                        <div class="stat-number stat-past" th:text="${stats.pastSemesters ?: 0}">0</div>
+                        <div class="stat-label">已结束</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 搜索和筛选 -->
+        <div class="filter-card">
+            <form method="get" th:action="@{/admin/semesters}">
+                <div class="row align-items-end">
+                    <div class="col-md-3">
+                        <label for="academicYear" class="form-label">学年</label>
+                        <input type="text" class="form-control search-box" id="academicYear" name="academicYear" 
+                               th:value="${academicYear}" placeholder="如：2024-2025">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="semesterType" class="form-label">学期类型</label>
+                        <select class="form-select" id="semesterType" name="semesterType">
+                            <option value="">全部类型</option>
+                            <option value="SPRING" th:selected="${semesterType == 'SPRING'}">春季学期</option>
+                            <option value="FALL" th:selected="${semesterType == 'FALL'}">秋季学期</option>
+                            <option value="SUMMER" th:selected="${semesterType == 'SUMMER'}">夏季学期</option>
+                            <option value="WINTER" th:selected="${semesterType == 'WINTER'}">冬季学期</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="status" class="form-label">状态</label>
+                        <select class="form-select" id="status" name="status">
+                            <option value="">全部状态</option>
+                            <option value="CURRENT" th:selected="${status == 'CURRENT'}">当前学期</option>
+                            <option value="UPCOMING" th:selected="${status == 'UPCOMING'}">即将开始</option>
+                            <option value="PAST" th:selected="${status == 'PAST'}">已结束</option>
+                            <option value="INACTIVE" th:selected="${status == 'INACTIVE'}">停用</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search me-1"></i>搜索
+                            </button>
+                            <a href="/admin/semesters" class="btn btn-outline-secondary">
+                                <i class="fas fa-undo me-1"></i>重置
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- 学期列表 -->
+        <div class="semester-table">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>
+                                <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+                            </th>
+                            <th>学期代码</th>
+                            <th>学期名称</th>
+                            <th>学年</th>
+                            <th>类型</th>
+                            <th>开始时间</th>
+                            <th>结束时间</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${semesters != null and !semesters.isEmpty()}" th:each="semester : ${semesters}">
+                            <td>
+                                <input type="checkbox" class="semester-checkbox" th:value="${semester.id}">
+                            </td>
+                            <td>
+                                <span class="fw-bold" th:text="${semester.semesterCode}">学期代码</span>
+                            </td>
+                            <td>
+                                <div>
+                                    <div class="fw-bold" th:text="${semester.semesterName}">学期名称</div>
+                                    <small class="text-muted" th:if="${semester.description}" th:text="${semester.description}">学期描述</small>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="fw-bold" th:text="${semester.academicYear}">学年</span>
+                            </td>
+                            <td>
+                                <span class="type-badge type-spring" th:if="${semester.semesterType == 'SPRING'}">春季</span>
+                                <span class="type-badge type-fall" th:if="${semester.semesterType == 'FALL'}">秋季</span>
+                                <span class="type-badge type-summer" th:if="${semester.semesterType == 'SUMMER'}">夏季</span>
+                                <span class="type-badge type-winter" th:if="${semester.semesterType == 'WINTER'}">冬季</span>
+                            </td>
+                            <td>
+                                <span th:text="${#temporals.format(semester.startDate, 'yyyy-MM-dd')}">开始时间</span>
+                            </td>
+                            <td>
+                                <span th:text="${#temporals.format(semester.endDate, 'yyyy-MM-dd')}">结束时间</span>
+                            </td>
+                            <td>
+                                <span class="status-badge status-current" th:if="${semester.status == 'CURRENT'}">当前</span>
+                                <span class="status-badge status-upcoming" th:if="${semester.status == 'UPCOMING'}">即将开始</span>
+                                <span class="status-badge status-past" th:if="${semester.status == 'PAST'}">已结束</span>
+                                <span class="status-badge status-inactive" th:if="${semester.status == 'INACTIVE'}">停用</span>
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a th:href="@{/admin/semesters/{id}(id=${semester.id})}" class="btn btn-sm btn-outline-primary" title="查看详情">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a th:href="@{/admin/semesters/{id}/edit(id=${semester.id})}" class="btn btn-sm btn-warning" title="编辑">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-danger" 
+                                            onclick="deleteSemester(this)" 
+                                            th:data-id="${semester.id}" 
+                                            th:data-name="${semester.semesterName}" 
+                                            title="删除">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${semesters == null or semesters.isEmpty()}">
+                            <td colspan="9">
+                                <div class="empty-state">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <h5>暂无学期数据</h5>
+                                    <p>系统中还没有任何学期信息</p>
+                                    <a href="/admin/semesters/add" class="btn btn-primary">
+                                        <i class="fas fa-plus me-2"></i>添加第一个学期
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- 批量操作 -->
+            <div class="p-3 border-top" th:if="${semesters != null and !semesters.isEmpty()}">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <button type="button" class="btn btn-danger" onclick="batchDelete()" disabled id="batchDeleteBtn">
+                            <i class="fas fa-trash me-2"></i>批量删除
+                        </button>
+                        <span class="text-muted ms-3">已选择 <span id="selectedCount">0</span> 项</span>
+                    </div>
+                    
+                    <!-- 分页 -->
+                    <nav th:if="${totalPages > 1}">
+                        <ul class="pagination mb-0">
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                <a class="page-link" th:href="@{/admin/semesters(page=${currentPage - 1}, academicYear=${academicYear}, semesterType=${semesterType}, status=${status})}">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" 
+                                th:classappend="${i == currentPage} ? 'active'">
+                                <a class="page-link" th:href="@{/admin/semesters(page=${i}, academicYear=${academicYear}, semesterType=${semesterType}, status=${status})}" 
+                                   th:text="${i + 1}">1</a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                                <a class="page-link" th:href="@{/admin/semesters(page=${currentPage + 1}, academicYear=${academicYear}, semesterType=${semesterType}, status=${status})}">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 全选/取消全选
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.semester-checkbox');
+            const batchDeleteBtn = document.getElementById('batchDeleteBtn');
+            const selectedCount = document.getElementById('selectedCount');
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+            });
+            
+            updateBatchButtons();
+        }
+        
+        // 更新批量操作按钮状态
+        function updateBatchButtons() {
+            const checkboxes = document.querySelectorAll('.semester-checkbox:checked');
+            const batchDeleteBtn = document.getElementById('batchDeleteBtn');
+            const selectedCount = document.getElementById('selectedCount');
+            
+            const count = checkboxes.length;
+            selectedCount.textContent = count;
+            batchDeleteBtn.disabled = count === 0;
+        }
+        
+        // 监听复选框变化
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkboxes = document.querySelectorAll('.semester-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateBatchButtons);
+            });
+        });
+        
+        // 删除单个学期
+        function deleteSemester(button) {
+            const semesterId = button.getAttribute('data-id');
+            const semesterName = button.getAttribute('data-name');
+            
+            if (confirm(`确定要删除学期 "${semesterName}" 吗？\n\n注意：删除学期将同时删除相关的选课记录！`)) {
+                // 创建表单并提交
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/admin/semesters/${semesterId}/delete`;
+                
+                // 添加CSRF token（如果需要）
+                const csrfToken = document.querySelector('meta[name="_csrf"]');
+                if (csrfToken) {
+                    const csrfInput = document.createElement('input');
+                    csrfInput.type = 'hidden';
+                    csrfInput.name = '_csrf';
+                    csrfInput.value = csrfToken.getAttribute('content');
+                    form.appendChild(csrfInput);
+                }
+                
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+        
+        // 批量删除
+        function batchDelete() {
+            const checkboxes = document.querySelectorAll('.semester-checkbox:checked');
+            const semesterIds = Array.from(checkboxes).map(cb => cb.value);
+            
+            if (semesterIds.length === 0) {
+                alert('请选择要删除的学期！');
+                return;
+            }
+            
+            if (confirm(`确定要删除选中的 ${semesterIds.length} 个学期吗？\n\n注意：删除学期将同时删除相关的选课记录！`)) {
+                // 创建表单并提交
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/admin/semesters/batch-delete';
+                
+                // 添加学期ID
+                semesterIds.forEach(id => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'semesterIds';
+                    input.value = id;
+                    form.appendChild(input);
+                });
+                
+                // 添加CSRF token（如果需要）
+                const csrfToken = document.querySelector('meta[name="_csrf"]');
+                if (csrfToken) {
+                    const csrfInput = document.createElement('input');
+                    csrfInput.type = 'hidden';
+                    csrfInput.name = '_csrf';
+                    csrfInput.value = csrfToken.getAttribute('content');
+                    form.appendChild(csrfInput);
+                }
+                
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.coursesystem.mapper.SemesterMapper">
+    
+    <!-- 结果映射 -->
+    <resultMap id="SemesterResultMap" type="org.example.coursesystem.entity.Semester">
+        <id property="id" column="id"/>
+        <result property="semesterCode" column="semester_code"/>
+        <result property="semesterName" column="semester_name"/>
+        <result property="academicYear" column="academic_year"/>
+        <result property="semesterType" column="semester_type"/>
+        <result property="startDate" column="start_date"/>
+        <result property="endDate" column="end_date"/>
+        <result property="registrationStartDate" column="registration_start_date"/>
+        <result property="registrationEndDate" column="registration_end_date"/>
+        <result property="status" column="status"/>
+        <result property="createdTime" column="created_time"/>
+        <result property="updatedTime" column="updated_time"/>
+    </resultMap>
+    
+    <!-- 查询所有学期 -->
+    <select id="findAll" resultMap="SemesterResultMap">
+        SELECT * FROM semester ORDER BY academic_year DESC, semester_type
+    </select>
+    
+    <!-- 根据ID查询学期 -->
+    <select id="findById" resultMap="SemesterResultMap">
+        SELECT * FROM semester WHERE id = #{id}
+    </select>
+    
+    <!-- 根据学期代码查询学期 -->
+    <select id="findBySemesterCode" resultMap="SemesterResultMap">
+        SELECT * FROM semester WHERE semester_code = #{semesterCode}
+    </select>
+    
+    <!-- 根据学年查询学期 -->
+    <select id="findByAcademicYear" resultMap="SemesterResultMap">
+        SELECT * FROM semester WHERE academic_year = #{academicYear} ORDER BY semester_type
+    </select>
+    
+    <!-- 根据学期类型查询 -->
+    <select id="findBySemesterType" resultMap="SemesterResultMap">
+        SELECT * FROM semester WHERE semester_type = #{semesterType} ORDER BY academic_year DESC
+    </select>
+    
+    <!-- 根据状态查询 -->
+    <select id="findByStatus" resultMap="SemesterResultMap">
+        SELECT * FROM semester WHERE status = #{status} ORDER BY academic_year DESC, semester_type
+    </select>
+    
+    <!-- 查询当前学期 -->
+    <select id="findCurrentSemester" resultMap="SemesterResultMap">
+        SELECT * FROM semester WHERE status = 'CURRENT' LIMIT 1
+    </select>
+    
+    <!-- 查询可选课学期 -->
+    <select id="findRegistrationAvailableSemesters" resultMap="SemesterResultMap">
+        SELECT * FROM semester 
+        WHERE status IN ('CURRENT', 'UPCOMING')
+          AND registration_start_date IS NOT NULL
+          AND registration_end_date IS NOT NULL
+          AND CURDATE() BETWEEN registration_start_date AND registration_end_date
+        ORDER BY academic_year DESC, semester_type
+    </select>
+    
+    <!-- 插入学期 -->
+    <insert id="insert" parameterType="org.example.coursesystem.entity.Semester" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO semester (
+            semester_code, semester_name, academic_year, semester_type,
+            start_date, end_date, registration_start_date, registration_end_date,
+            status, created_time, updated_time
+        ) VALUES (
+            #{semesterCode}, #{semesterName}, #{academicYear}, #{semesterType},
+            #{startDate}, #{endDate}, #{registrationStartDate}, #{registrationEndDate},
+            #{status}, #{createdTime}, #{updatedTime}
+        )
+    </insert>
+    
+    <!-- 更新学期 -->
+    <update id="update" parameterType="org.example.coursesystem.entity.Semester">
+        UPDATE semester SET
+            semester_code = #{semesterCode},
+            semester_name = #{semesterName},
+            academic_year = #{academicYear},
+            semester_type = #{semesterType},
+            start_date = #{startDate},
+            end_date = #{endDate},
+            registration_start_date = #{registrationStartDate},
+            registration_end_date = #{registrationEndDate},
+            status = #{status},
+            updated_time = #{updatedTime}
+        WHERE id = #{id}
+    </update>
+    
+    <!-- 删除学期 -->
+    <delete id="deleteById">
+        DELETE FROM semester WHERE id = #{id}
+    </delete>
+    
+    <!-- 批量删除学期 -->
+    <delete id="deleteByIds">
+        DELETE FROM semester WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+    <!-- 检查学期代码是否存在 -->
+    <select id="existsBySemesterCode" resultType="boolean">
+        SELECT COUNT(*) > 0 FROM semester 
+        WHERE semester_code = #{semesterCode}
+        <if test="excludeId != null">
+            AND id != #{excludeId}
+        </if>
+    </select>
+    
+    <!-- 统计学期总数 -->
+    <select id="count" resultType="long">
+        SELECT COUNT(*) FROM semester
+    </select>
+    
+</mapper>
