@@ -8,6 +8,8 @@ import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.example.coursesystem.entity.OperationLog;
 import org.example.coursesystem.entity.User;
+import org.example.coursesystem.message.LogMessage;
+import org.example.coursesystem.message.MessageProducerService;
 import org.example.coursesystem.service.OperationLogService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +39,9 @@ public class LoggingAspect {
     
     @Autowired
     private OperationLogService operationLogService;
+    
+    @Autowired
+    private MessageProducerService messageProducerService;
     
     @Autowired
     private ObjectMapper objectMapper;
@@ -149,11 +154,36 @@ public class LoggingAspect {
             operationLog.setExecutionTime(endTime - startTime);
             operationLog.setCreateTime(LocalDateTime.now());
             
-            // 异步保存操作日志
+            // 通过消息队列异步保存操作日志
             try {
-                operationLogService.saveOperationLogAsync(operationLog);
+                // 创建日志消息对象
+                LogMessage logMessage = new LogMessage(
+                    operationLog.getUserId(),
+                    operationLog.getUsername(),
+                    operationLog.getOperationType(),
+                    operationLog.getOperationDescription(),
+                    operationLog.getModule(),
+                    operationLog.getMethod(),
+                    operationLog.getRequestUrl(),
+                    operationLog.getClientIp(),
+                    operationLog.getRequestParams(),
+                    operationLog.getResult(),
+                    operationLog.getErrorMessage(),
+                    operationLog.getExecutionTime(),
+                    operationLog.getOperationTime()
+                );
+                
+                // 发送日志消息到队列
+                messageProducerService.sendLogMessage(logMessage);
+                
             } catch (Exception e) {
-                logger.error("保存操作日志失败: {}", e.getMessage(), e);
+                logger.error("发送日志消息失败，回退到直接保存: {}", e.getMessage(), e);
+                // 如果消息队列发送失败，回退到直接保存
+                try {
+                    operationLogService.saveOperationLogAsync(operationLog);
+                } catch (Exception ex) {
+                    logger.error("直接保存操作日志也失败: {}", ex.getMessage(), ex);
+                }
             }
         }
         

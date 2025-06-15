@@ -5,6 +5,7 @@ import org.example.coursesystem.entity.CourseSelection;
 import org.example.coursesystem.entity.Semester;
 import org.example.coursesystem.entity.Student;
 import org.example.coursesystem.mapper.CourseSelectionMapper;
+import org.example.coursesystem.message.MessageProducerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -33,6 +34,9 @@ public class CourseSelectionService {
     
     @Autowired
     private StudentService studentService;
+    
+    @Autowired
+    private MessageProducerService messageProducerService;
     
     /**
      * 查询所有选课记录
@@ -225,12 +229,48 @@ public class CourseSelectionService {
             courseSelection.setUpdatedTime(LocalDateTime.now());
             
             if (courseSelectionMapper.insert(courseSelection) > 0) {
+                // 发送选课成功通知
+                try {
+                    messageProducerService.sendCourseSelectionSuccessNotification(
+                        student.getName(), 
+                        course.getCourseName()
+                    );
+                } catch (Exception e) {
+                    // 消息发送失败不影响选课结果
+                    e.printStackTrace();
+                }
                 return "选课成功";
             } else {
+                // 发送选课失败通知
+                try {
+                    messageProducerService.sendCourseSelectionFailureNotification(
+                        student.getName(), 
+                        course.getCourseName(), 
+                        "数据库操作失败"
+                    );
+                } catch (Exception e) {
+                    // 消息发送失败不影响选课结果
+                    e.printStackTrace();
+                }
                 return "选课失败";
             }
         } catch (Exception e) {
             e.printStackTrace();
+            // 发送选课失败通知
+            try {
+                Student student = studentService.findById(studentId);
+                Course course = courseService.findById(courseId);
+                if (student != null && course != null) {
+                    messageProducerService.sendCourseSelectionFailureNotification(
+                        student.getName(), 
+                        course.getCourseName(), 
+                        e.getMessage()
+                    );
+                }
+            } catch (Exception notificationException) {
+                // 消息发送失败不影响选课结果
+                notificationException.printStackTrace();
+            }
             return "选课失败：" + e.getMessage();
         }
     }
