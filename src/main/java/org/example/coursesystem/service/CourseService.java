@@ -3,6 +3,8 @@ package org.example.coursesystem.service;
 import org.example.coursesystem.entity.Course;
 import org.example.coursesystem.mapper.CourseMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +24,7 @@ public class CourseService {
     /**
      * 查询所有课程
      */
+    @Cacheable(value = "courses", key = "'all'")
     public List<Course> findAll() {
         return courseMapper.findAll();
     }
@@ -29,6 +32,7 @@ public class CourseService {
     /**
      * 根据ID查询课程
      */
+    @Cacheable(value = "courses", key = "#id")
     public Course findById(Long id) {
         return courseMapper.findById(id);
     }
@@ -36,6 +40,7 @@ public class CourseService {
     /**
      * 根据课程代码查询课程
      */
+    @Cacheable(value = "courses", key = "'code:' + #courseCode")
     public Course findByCourseCode(String courseCode) {
         return courseMapper.findByCourseCode(courseCode);
     }
@@ -50,6 +55,7 @@ public class CourseService {
     /**
      * 根据课程类型查询
      */
+    @Cacheable(value = "courses", key = "'type:' + #courseType")
     public List<Course> findByCourseType(String courseType) {
         return courseMapper.findByCourseType(courseType);
     }
@@ -57,6 +63,7 @@ public class CourseService {
     /**
      * 根据开课院系查询
      */
+    @Cacheable(value = "courses", key = "'dept:' + #department")
     public List<Course> findByDepartment(String department) {
         return courseMapper.findByDepartment(department);
     }
@@ -99,6 +106,7 @@ public class CourseService {
     /**
      * 添加课程
      */
+    @CacheEvict(value = "courses", allEntries = true)
     public boolean save(Course course) {
         try {
             if (course.getId() == null) {
@@ -120,6 +128,7 @@ public class CourseService {
     /**
      * 更新课程
      */
+    @CacheEvict(value = "courses", allEntries = true)
     public boolean update(Course course) {
         try {
             course.setUpdatedTime(LocalDateTime.now());
@@ -133,6 +142,7 @@ public class CourseService {
     /**
      * 删除课程
      */
+    @CacheEvict(value = "courses", allEntries = true)
     public boolean deleteById(Long id) {
         try {
             return courseMapper.deleteById(id) > 0;
@@ -145,6 +155,7 @@ public class CourseService {
     /**
      * 批量删除课程
      */
+    @CacheEvict(value = "courses", allEntries = true)
     public boolean deleteByIds(List<Long> ids) {
         try {
             return courseMapper.deleteByIds(ids) > 0;

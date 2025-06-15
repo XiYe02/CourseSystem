@@ -6,6 +6,8 @@ import org.example.coursesystem.entity.Semester;
 import org.example.coursesystem.entity.Student;
 import org.example.coursesystem.mapper.CourseSelectionMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +37,7 @@ public class CourseSelectionService {
     /**
      * 查询所有选课记录
      */
+    @Cacheable(value = "courseSelections", key = "'all'")
     public List<CourseSelection> findAll() {
         return courseSelectionMapper.findAll();
     }
@@ -42,6 +45,7 @@ public class CourseSelectionService {
     /**
      * 查询所有选课记录（包含学生、课程、学期信息）
      */
+    @Cacheable(value = "courseSelections", key = "'allWithDetails'")
     public List<CourseSelection> findAllWithDetails() {
         return courseSelectionMapper.findAllWithDetails();
     }
@@ -49,6 +53,7 @@ public class CourseSelectionService {
     /**
      * 根据ID查询选课记录
      */
+    @Cacheable(value = "courseSelections", key = "#id")
     public CourseSelection findById(Long id) {
         return courseSelectionMapper.findById(id);
     }
@@ -56,6 +61,7 @@ public class CourseSelectionService {
     /**
      * 根据学生ID查询选课记录
      */
+    @Cacheable(value = "courseSelections", key = "'student:' + #studentId")
     public List<CourseSelection> findByStudentId(Long studentId) {
         return courseSelectionMapper.findByStudentId(studentId);
     }
@@ -63,6 +69,7 @@ public class CourseSelectionService {
     /**
      * 根据学生ID查询选课记录（包含课程、学期信息）
      */
+    @Cacheable(value = "courseSelections", key = "'studentDetails:' + #studentId")
     public List<CourseSelection> findByStudentIdWithDetails(Long studentId) {
         return courseSelectionMapper.findByStudentIdWithDetails(studentId);
     }
@@ -161,6 +168,7 @@ public class CourseSelectionService {
     /**
      * 学生选课
      */
+    @CacheEvict(value = "courseSelections", allEntries = true)
     public String selectCourse(Long studentId, Long courseId, Long semesterId) {
         try {
             // 验证学生是否存在
@@ -230,6 +238,7 @@ public class CourseSelectionService {
     /**
      * 学生退课
      */
+    @CacheEvict(value = "courseSelections", allEntries = true)
     public String dropCourse(Long studentId, Long courseId, Long semesterId) {
         try {
             // 查找选课记录
@@ -275,6 +284,7 @@ public class CourseSelectionService {
     /**
      * 添加或更新选课记录
      */
+    @CacheEvict(value = "courseSelections", allEntries = true)
     public boolean save(CourseSelection courseSelection) {
         try {
             if (courseSelection.getId() == null) {
@@ -296,6 +306,7 @@ public class CourseSelectionService {
     /**
      * 更新选课记录
      */
+    @CacheEvict(value = "courseSelections", allEntries = true)
     public boolean update(CourseSelection courseSelection) {
         try {
             courseSelection.setUpdatedTime(LocalDateTime.now());
@@ -309,6 +320,7 @@ public class CourseSelectionService {
     /**
      * 删除选课记录
      */
+    @CacheEvict(value = "courseSelections", allEntries = true)
     public boolean deleteById(Long id) {
         try {
             return courseSelectionMapper.deleteById(id) > 0;
@@ -321,6 +333,7 @@ public class CourseSelectionService {
     /**
      * 批量删除选课记录
      */
+    @CacheEvict(value = "courseSelections", allEntries = true)
     public boolean deleteByIds(List<Long> ids) {
         try {
             return courseSelectionMapper.deleteByIds(ids) > 0;
@@ -333,6 +346,7 @@ public class CourseSelectionService {
     /**
      * 根据学生ID删除选课记录
      */
+    @CacheEvict(value = "courseSelections", allEntries = true)
     public boolean deleteByStudentId(Long studentId) {
         try {
             return courseSelectionMapper.deleteByStudentId(studentId) > 0;
@@ -345,6 +359,7 @@ public class CourseSelectionService {
     /**
      * 根据课程ID删除选课记录
      */
+    @CacheEvict(value = "courseSelections", allEntries = true)
     public boolean deleteByCourseId(Long courseId) {
         try {
             return courseSelectionMapper.deleteByCourseId(courseId) > 0;

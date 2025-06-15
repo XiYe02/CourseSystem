@@ -3,6 +3,8 @@ package org.example.coursesystem.service;
 import org.example.coursesystem.entity.Semester;
 import org.example.coursesystem.mapper.SemesterMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +24,7 @@ public class SemesterService {
     /**
      * 查询所有学期
      */
+    @Cacheable(value = "semesters", key = "'all'")
     public List<Semester> findAll() {
         return semesterMapper.findAll();
     }
@@ -29,6 +32,7 @@ public class SemesterService {
     /**
      * 根据ID查询学期
      */
+    @Cacheable(value = "semesters", key = "#id")
     public Semester findById(Long id) {
         return semesterMapper.findById(id);
     }
@@ -36,6 +40,7 @@ public class SemesterService {
     /**
      * 根据学期代码查询学期
      */
+    @Cacheable(value = "semesters", key = "'code:' + #semesterCode")
     public Semester findBySemesterCode(String semesterCode) {
         return semesterMapper.findBySemesterCode(semesterCode);
     }
@@ -64,6 +69,7 @@ public class SemesterService {
     /**
      * 查询当前学期
      */
+    @Cacheable(value = "semesters", key = "'current'")
     public Semester findCurrentSemester() {
         return semesterMapper.findCurrentSemester();
     }
@@ -78,6 +84,7 @@ public class SemesterService {
     /**
      * 添加或更新学期
      */
+    @CacheEvict(value = "semesters", allEntries = true)
     public boolean save(Semester semester) {
         try {
             if (semester.getId() == null) {
@@ -99,6 +106,7 @@ public class SemesterService {
     /**
      * 更新学期
      */
+    @CacheEvict(value = "semesters", allEntries = true)
     public boolean update(Semester semester) {
         try {
             semester.setUpdatedTime(LocalDateTime.now());
@@ -112,6 +120,7 @@ public class SemesterService {
     /**
      * 删除学期
      */
+    @CacheEvict(value = "semesters", allEntries = true)
     public boolean deleteById(Long id) {
         try {
             return semesterMapper.deleteById(id) > 0;
@@ -124,6 +133,7 @@ public class SemesterService {
     /**
      * 批量删除学期
      */
+    @CacheEvict(value = "semesters", allEntries = true)
     public boolean deleteByIds(List<Long> ids) {
         try {
             return semesterMapper.deleteByIds(ids) > 0;

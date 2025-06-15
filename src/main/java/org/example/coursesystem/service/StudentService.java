@@ -3,6 +3,8 @@ package org.example.coursesystem.service;
 import org.example.coursesystem.entity.Student;
 import org.example.coursesystem.mapper.StudentMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +24,7 @@ public class StudentService {
     /**
      * 根据ID查找学生
      */
+    @Cacheable(value = "students", key = "#id")
     public Student findById(Long id) {
         if (id == null) {
             throw new IllegalArgumentException("学生ID不能为空");
@@ -32,6 +35,7 @@ public class StudentService {
     /**
      * 根据学号查找学生
      */
+    @Cacheable(value = "students", key = "'number:' + #studentNumber")
     public Student findByStudentNumber(String studentNumber) {
         if (studentNumber == null || studentNumber.trim().isEmpty()) {
             throw new IllegalArgumentException("学号不能为空");
@@ -42,6 +46,7 @@ public class StudentService {
     /**
      * 查询所有学生
      */
+    @Cacheable(value = "students", key = "'all'")
     public List<Student> findAll() {
         return studentMapper.findAll();
     }
@@ -49,6 +54,7 @@ public class StudentService {
     /**
      * 根据专业查询学生
      */
+    @Cacheable(value = "students", key = "'major:' + #major")
     public List<Student> findByMajor(String major) {
         if (major == null || major.trim().isEmpty()) {
             return findAll();
@@ -59,6 +65,7 @@ public class StudentService {
     /**
      * 根据年级查询学生
      */
+    @Cacheable(value = "students", key = "'grade:' + #grade")
     public List<Student> findByGrade(Integer grade) {
         if (grade == null) {
             return findAll();
@@ -89,6 +96,7 @@ public class StudentService {
     /**
      * 添加学生
      */
+    @CacheEvict(value = "students", allEntries = true)
     public boolean addStudent(Student student) {
         if (student == null) {
             throw new IllegalArgumentException("学生信息不能为空");
@@ -120,6 +128,7 @@ public class StudentService {
     /**
      * 更新学生信息
      */
+    @CacheEvict(value = "students", allEntries = true)
     public boolean updateStudent(Student student) {
         if (student == null || student.getId() == null) {
             throw new IllegalArgumentException("学生信息或ID不能为空");
@@ -145,6 +154,7 @@ public class StudentService {
     /**
      * 根据ID删除学生
      */
+    @CacheEvict(value = "students", allEntries = true)
     public boolean deleteById(Long id) {
         if (id == null) {
             throw new IllegalArgumentException("学生ID不能为空");
@@ -161,6 +171,7 @@ public class StudentService {
     /**
      * 批量删除学生
      */
+    @CacheEvict(value = "students", allEntries = true)
     public boolean deleteByIds(List<Long> ids) {
         if (ids == null || ids.isEmpty()) {
             throw new IllegalArgumentException("学生ID列表不能为空");
