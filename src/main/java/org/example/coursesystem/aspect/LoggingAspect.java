@@ -10,6 +10,7 @@ import org.example.coursesystem.entity.OperationLog;
 import org.example.coursesystem.entity.User;
 import org.example.coursesystem.message.LogMessage;
 import org.example.coursesystem.message.MessageProducerService;
+import org.example.coursesystem.security.CustomUserDetails;
 import org.example.coursesystem.service.OperationLogService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,8 +32,8 @@ import java.util.Map;
  * 操作日志切面类
  * 使用AOP技术自动记录用户操作日志
  */
-@Aspect
-@Component
+@Aspect// 切面注解
+@Component// 组件注解，将切面类加入IOC容器
 public class LoggingAspect {
     
     private static final Logger logger = LoggerFactory.getLogger(LoggingAspect.class);
@@ -214,7 +215,9 @@ public class LoggingAspect {
             if (authentication != null && authentication.isAuthenticated() 
                 && !"anonymousUser".equals(authentication.getPrincipal())) {
                 Object principal = authentication.getPrincipal();
-                if (principal instanceof User) {
+                if (principal instanceof CustomUserDetails) {
+                    return ((CustomUserDetails) principal).getUser();
+                } else if (principal instanceof User) {
                     return (User) principal;
                 }
             }

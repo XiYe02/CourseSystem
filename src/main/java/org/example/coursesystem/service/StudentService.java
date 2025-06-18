@@ -14,33 +14,33 @@ import java.util.List;
 /**
  * 学生服务层
  */
-@Service
-@Transactional
+@Service// 注解，表示这是一个服务层组件
+@Transactional// 注解，表示该类中的方法都需要开启事务管理
 public class StudentService {
     
-    @Autowired
+    @Autowired// 注解，表示自动装配学生数据访问层接口的实现类
     private StudentMapper studentMapper;
     
     /**
      * 根据ID查找学生
      */
-    @Cacheable(value = "students", key = "#id")
+    @Cacheable(value = "students", key = "#id")// 注解，表示根据学生ID缓存学生对象
     public Student findById(Long id) {
         if (id == null) {
             throw new IllegalArgumentException("学生ID不能为空");
         }
-        return studentMapper.findById(id);
+        return studentMapper.findById(id);// 注解，表示根据学生ID从数据库中查询学生对象
     }
     
     /**
      * 根据学号查找学生
      */
-    @Cacheable(value = "students", key = "'number:' + #studentNumber")
+    @Cacheable(value = "students", key = "'number:' + #studentNumber")// 注解，表示根据学生学号缓存学生对象
     public Student findByStudentNumber(String studentNumber) {
         if (studentNumber == null || studentNumber.trim().isEmpty()) {
             throw new IllegalArgumentException("学号不能为空");
         }
-        return studentMapper.findByStudentNumber(studentNumber.trim());
+        return studentMapper.findByStudentNumber(studentNumber.trim());// 注解，表示根据学生学号从数据库中查询学生对象
     }
     
     /**

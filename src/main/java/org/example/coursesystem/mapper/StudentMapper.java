@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * 学生数据访问层接口
  */
-@Mapper
+@Mapper// 注解，表示这是一个MyBatis的Mapper接口
 public interface StudentMapper {
     
     /**

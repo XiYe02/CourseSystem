@@ -94,7 +94,7 @@
         DELETE FROM student WHERE id = #{id}
     </delete>
     
-    <!-- 批量删除学生 -->
+    <!-- 批量删除学生 DELETE FROM student WHERE id IN (1, 2, 3)-->
     <delete id="deleteByIds">
         DELETE FROM student WHERE id IN
         <foreach collection="ids" item="id" open="(" separator="," close=")">

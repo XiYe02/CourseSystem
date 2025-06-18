@@ -20,19 +20,27 @@ import java.util.Map;
 /**
  * 学生管理控制器
  */
-@Controller
-@RequestMapping("/admin/students")
-@PreAuthorize("hasRole('ADMIN')")
+@Controller// 注解，表示这是一个控制器组件
+@RequestMapping("/admin/students")// 定义控制器的请求映射路径为/admin/students
+@PreAuthorize("hasRole('ADMIN')")// 权限控制注解，只允许具有ADMIN角色的用户访问该控制器下的所有接口
 public class StudentController {
     
-    @Autowired
+    @Autowired// 自动装配学生服务接口的实现类
     private StudentService studentService;
+    
+    /**
+     * 重定向到学生管理主页
+     */
+    @GetMapping
+    public String redirectToIndex() {
+        return "redirect:/admin/students/index";
+    }
     
     /**
      * 学生管理主页
      */
-    @GetMapping
-    @LogOperation(operationType = "SELECT", description = "查看学生列表", module = "学生管理")
+    @GetMapping("/index")// 定义请求映射路径为/index
+    @LogOperation(operationType = "SELECT", description = "查看学生列表", module = "学生管理")// 日志记录操作，操作类型为SELECT，描述为查看学生列表，模块为学生管理
     public String index(Model model,
                        @RequestParam(value = "keyword", required = false) String keyword,
                        @RequestParam(value = "major", required = false) String major,
@@ -55,7 +63,7 @@ public class StudentController {
             students = studentService.findByStatus(status);
             model.addAttribute("status", status);
         } else {
-            students = studentService.findAll();
+            students = studentService.findAll();//
         }
         
         model.addAttribute("students", students);
@@ -91,12 +99,12 @@ public class StudentController {
                            Model model) {
         
         if (bindingResult.hasErrors()) {
-            model.addAttribute("action", "add");
-            return "admin/students/form";
+            model.addAttribute("action", "add");// 模型属性，用于在视图中显示操作类型为添加学生
+            return "admin/students/form";// 返回添加学生表单视图
         }
         
         try {
-            boolean success = studentService.addStudent(student);
+            boolean success = studentService.addStudent(student);// 调用学生服务接口的添加学生方法
             if (success) {
                 redirectAttributes.addFlashAttribute("successMessage", "学生添加成功！");
                 return "redirect:/admin/students";
@@ -152,7 +160,7 @@ public class StudentController {
         }
         
         try {
-            boolean success = studentService.updateStudent(student);
+            boolean success = studentService.updateStudent(student);// 调用学生服务接口的更新学生方法
             if (success) {
                 redirectAttributes.addFlashAttribute("successMessage", "学生信息更新成功！");
                 return "redirect:/admin/students";
@@ -192,13 +200,13 @@ public class StudentController {
      * 删除学生
      */
     @PostMapping("/delete/{id}")
-    @ResponseBody
+    @ResponseBody// 响应体，用于返回JSON格式的数据
     @LogOperation(operationType = "DELETE", description = "删除学生", module = "学生管理", logParams = true)
     public ResponseEntity<Map<String, Object>> deleteStudent(@PathVariable Long id) {
         Map<String, Object> response = new HashMap<>();
         
         try {
-            boolean success = studentService.deleteById(id);
+            boolean success = studentService.deleteById(id);// 调用学生服务接口的删除学生方法
             if (success) {
                 response.put("success", true);
                 response.put("message", "学生删除成功！");
@@ -223,7 +231,7 @@ public class StudentController {
         Map<String, Object> response = new HashMap<>();
         
         try {
-            boolean success = studentService.deleteByIds(ids);
+            boolean success = studentService.deleteByIds(ids);// 调用学生服务接口的批量删除学生方法
             if (success) {
                 response.put("success", true);
                 response.put("message", "批量删除成功！");
@@ -248,7 +256,7 @@ public class StudentController {
         Map<String, Object> response = new HashMap<>();
         
         try {
-            boolean exists = studentService.existsByStudentNumber(studentNumber);
+            boolean exists = studentService.existsByStudentNumber(studentNumber);// 调用学生服务接口的检查学号是否存在方法
             response.put("exists", exists);
         } catch (Exception e) {
             response.put("error", e.getMessage());

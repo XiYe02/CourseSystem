@@ -14,15 +14,15 @@ import java.time.LocalDateTime;
 public class Student {
     private Long id;
     
-    @NotBlank(message = "学号不能为空")
-    @Size(max = 20, message = "学号长度不能超过20个字符")
+    @NotBlank(message = "学号不能为空")// 非空校验注解，用于验证学号不能为空
+    @Size(max = 20, message = "学号长度不能超过20个字符")// 长度校验注解，用于验证学号长度不能超过20个字符
     private String studentNumber;
     
-    @NotBlank(message = "姓名不能为空")
-    @Size(max = 50, message = "姓名长度不能超过50个字符")
+    @NotBlank(message = "姓名不能为空")// 非空校验注解，用于验证姓名不能为空
+    @Size(max = 50, message = "姓名长度不能超过50个字符")// 长度校验注解，用于验证姓名长度不能超过50个字符
     private String name;
     
-    @Pattern(regexp = "MALE|FEMALE", message = "性别只能是MALE或FEMALE")
+    @Pattern(regexp = "MALE|FEMALE", message = "性别只能是MALE或FEMALE")// 正则表达式校验注解，用于验证性别只能是MALE或FEMALE
     private String gender;
     
     private LocalDate birthDate;

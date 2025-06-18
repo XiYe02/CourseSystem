@@ -381,17 +381,17 @@
                                     <span class="status-badge status-completed" th:if="${selection.status == 'COMPLETED'}">已完成</span>
                                     <span class="status-badge status-failed" th:if="${selection.status == 'FAILED'}">未通过</span>
                                 </div>
-                                <div th:if="${selection.grade != null}">
-                                    <span class="grade-display grade-excellent" th:if="${selection.grade >= 90}" th:text="${selection.grade}">成绩</span>
-                                    <span class="grade-display grade-good" th:if="${selection.grade >= 80 and selection.grade < 90}" th:text="${selection.grade}">成绩</span>
-                                    <span class="grade-display grade-average" th:if="${selection.grade >= 60 and selection.grade < 80}" th:text="${selection.grade}">成绩</span>
-                                    <span class="grade-display grade-poor" th:if="${selection.grade < 60}" th:text="${selection.grade}">成绩</span>
+                                <div th:if="${selection.score != null}">
+                                    <span class="grade-display grade-excellent" th:if="${selection.score >= 90}" th:text="${selection.score}">成绩</span>
+                                    <span class="grade-display grade-good" th:if="${selection.score >= 80 and selection.score < 90}" th:text="${selection.score}">成绩</span>
+                                    <span class="grade-display grade-average" th:if="${selection.score >= 60 and selection.score < 80}" th:text="${selection.score}">成绩</span>
+                                    <span class="grade-display grade-poor" th:if="${selection.score < 60}" th:text="${selection.score}">成绩</span>
                                 </div>
                             </div>
                             
-                            <div th:if="${selection.gpa != null}" class="mt-2">
+                            <div th:if="${selection.gradePoint != null}" class="mt-2">
                                 <small class="text-muted">
-                                    绩点：<span class="fw-bold" th:text="${selection.gpa}">0.0</span>
+                                    绩点：<span class="fw-bold" th:text="${selection.gradePoint}">0.0</span>
                                 </small>
                             </div>
                             

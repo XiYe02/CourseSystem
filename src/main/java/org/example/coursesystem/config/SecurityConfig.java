@@ -20,9 +20,9 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 /**
  * Spring Security配置类
  */
-@Configuration
-@EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true)
+@Configuration// 配置类注解
+@EnableWebSecurity// 启用Web安全功能
+@EnableMethodSecurity(prePostEnabled = true)// 启用方法级别的安全认证
 public class SecurityConfig {
     
     @Autowired
@@ -31,7 +31,7 @@ public class SecurityConfig {
     /**
      * 密码编码器
      */
-    @Bean
+    @Bean// 密码编码器Bean注解
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }

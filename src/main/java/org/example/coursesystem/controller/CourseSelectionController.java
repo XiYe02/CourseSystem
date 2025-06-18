@@ -443,7 +443,7 @@ public class CourseSelectionController {
     /**
      * 导出Excel格式的选课数据
      */
-    @GetMapping("/admin/course-selections/export/excel")
+    @GetMapping("/admin/course-selections/export/excel")// 注解，表示该方法处理的请求路径为/admin/course-selections/export/excel
     @PreAuthorize("hasRole('ADMIN')")
     public void exportExcel(HttpServletResponse response,
                            @RequestParam(value = "studentKeyword", required = false) String studentKeyword,

@@ -21,11 +21,11 @@ import java.util.Map;
  * 课程管理控制器
  */
 @Controller
-@RequestMapping("/admin/courses")
+@RequestMapping("/admin/courses")// 注解，表示该控制器处理的请求路径前缀为/admin/courses
 @PreAuthorize("hasRole('ADMIN')")
 public class CourseController {
     
-    @Autowired
+    @Autowired// 注解，表示自动装配课程业务层接口的实现类
     private CourseService courseService;
     
     /**
