@@ -8,7 +8,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #2563eb;
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -17,18 +17,16 @@
         }
         
         .register-container {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
             overflow: hidden;
             max-width: 450px;
             width: 100%;
         }
         
         .register-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #1d4ed8;
             color: white;
             padding: 2rem;
             text-align: center;
@@ -55,16 +53,15 @@
         }
         
         .form-floating > .form-control {
-            border: 2px solid #e9ecef;
-            border-radius: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
             padding: 1rem 0.75rem;
             height: auto;
-            transition: all 0.3s ease;
         }
         
         .form-floating > .form-control:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            border-color: #2563eb;
+            outline: none;
         }
         
         .form-floating > label {
@@ -73,36 +70,32 @@
         }
         
         .btn-register {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #2563eb;
             border: none;
-            border-radius: 10px;
+            border-radius: 6px;
             padding: 0.75rem 2rem;
             font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
             width: 100%;
             margin-top: 1rem;
         }
         
         .btn-register:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            background: #1d4ed8;
         }
         
         .alert {
-            border-radius: 10px;
+            border-radius: 6px;
             border: none;
             margin-bottom: 1rem;
         }
         
         .alert-danger {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            background: #dc2626;
             color: white;
         }
         
         .alert-success {
-            background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+            background: #16a34a;
             color: white;
         }
         
@@ -126,12 +119,12 @@
             background: transparent;
             border: 2px solid #e9ecef;
             border-right: none;
-            border-radius: 10px 0 0 10px;
+            border-radius: 6px 0 0 6px;
         }
         
         .input-group .form-control {
             border-left: none;
-            border-radius: 0 10px 10px 0;
+            border-radius: 0 6px 6px 0;
         }
         
         .password-requirements {

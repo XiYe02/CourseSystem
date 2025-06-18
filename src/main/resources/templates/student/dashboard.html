@@ -13,8 +13,7 @@
         }
         
         .navbar {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            background: #2563eb;
         }
         
         .navbar-brand {
@@ -27,32 +26,25 @@
         }
         
         .welcome-card {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            background: #2563eb;
             color: white;
-            border-radius: 15px;
+            border-radius: 8px;
             padding: 2rem;
             margin-bottom: 2rem;
-            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.3);
         }
         
         .stats-card {
             background: white;
-            border-radius: 15px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        
-        .stats-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #e0e0e0;
         }
         
         .stats-icon {
             width: 60px;
             height: 60px;
-            border-radius: 50%;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -62,19 +54,19 @@
         }
         
         .stats-icon.courses {
-            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            background: #3b82f6;
         }
         
         .stats-icon.selected {
-            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            background: #1d4ed8;
         }
         
         .stats-icon.credits {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #1e40af;
         }
         
         .stats-icon.gpa {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            background: #60a5fa;
         }
         
         .stats-number {
@@ -104,35 +96,33 @@
             padding: 1rem;
             margin-bottom: 1rem;
             border: none;
-            border-radius: 10px;
+            border-radius: 6px;
             text-decoration: none;
             color: white;
             font-weight: 500;
-            transition: all 0.3s ease;
             text-align: center;
         }
         
         .action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
             color: white;
             text-decoration: none;
+            opacity: 0.9;
         }
         
         .action-btn.select {
-            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            background: #16a34a;
         }
         
         .action-btn.view {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            background: #2563eb;
         }
         
         .action-btn.download {
-            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            background: #ca8a04;
         }
         
         .action-btn.schedule {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #2563eb;
         }
         
         .section-title {
@@ -145,11 +135,11 @@
         
         .course-item {
             background: white;
-            border-radius: 10px;
+            border-radius: 6px;
             padding: 1rem;
             margin-bottom: 1rem;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            border-left: 4px solid #4facfe;
+            border: 1px solid #e5e7eb;
+            border-left: 4px solid #2563eb;
         }
         
         .course-name {
@@ -165,7 +155,7 @@
         
         .status-badge {
             padding: 0.25rem 0.75rem;
-            border-radius: 20px;
+            border-radius: 4px;
             font-size: 0.8rem;
             font-weight: 500;
         }
@@ -229,110 +219,14 @@
             </div>
         </div>
         
-        <!-- 统计卡片 -->
-        <div class="row">
-            <div class="col-md-3">
-                <div class="stats-card">
-                    <div class="stats-icon courses">
-                        <i class="fas fa-book"></i>
-                    </div>
-                    <div class="stats-number">24</div>
-                    <div class="stats-label">可选课程</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stats-card">
-                    <div class="stats-icon selected">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                    <div class="stats-number">6</div>
-                    <div class="stats-label">已选课程</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stats-card">
-                    <div class="stats-icon credits">
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="stats-number">18</div>
-                    <div class="stats-label">已获学分</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stats-card">
-                    <div class="stats-icon gpa">
-                        <i class="fas fa-trophy"></i>
-                    </div>
-                    <div class="stats-number">3.8</div>
-                    <div class="stats-label">平均绩点</div>
-                </div>
-            </div>
-        </div>
+
         
-        <!-- 主要功能区域 -->
-        <div class="row">
-            <div class="col-md-8">
-                <!-- 我的课程 -->
+        <!-- 功能按钮区域 -->
+        <div class="row justify-content-center">
+            <div class="col-md-6">
                 <div class="quick-actions">
                     <h4 class="section-title">
-                        <i class="fas fa-bookmark me-2"></i>我的课程
-                    </h4>
-                    
-                    <div class="course-item">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <div class="course-name">高等数学A</div>
-                                <div class="course-info">
-                                    <i class="fas fa-user me-1"></i>张教授 |
-                                    <i class="fas fa-clock me-1"></i>周一 8:00-10:00 |
-                                    <i class="fas fa-map-marker-alt me-1"></i>教学楼A101
-                                </div>
-                            </div>
-                            <span class="status-badge status-selected">已选</span>
-                        </div>
-                    </div>
-                    
-                    <div class="course-item">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <div class="course-name">大学英语</div>
-                                <div class="course-info">
-                                    <i class="fas fa-user me-1"></i>李老师 |
-                                    <i class="fas fa-clock me-1"></i>周三 14:00-16:00 |
-                                    <i class="fas fa-map-marker-alt me-1"></i>外语楼B201
-                                </div>
-                            </div>
-                            <span class="status-badge status-selected">已选</span>
-                        </div>
-                    </div>
-                    
-                    <div class="course-item">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <div class="course-name">计算机程序设计</div>
-                                <div class="course-info">
-                                    <i class="fas fa-user me-1"></i>王教授 |
-                                    <i class="fas fa-clock me-1"></i>周五 10:00-12:00 |
-                                    <i class="fas fa-map-marker-alt me-1"></i>计算机楼C301
-                                </div>
-                            </div>
-                            <span class="status-badge status-pending">待确认</span>
-                        </div>
-                    </div>
-                    
-                    <div class="text-center mt-3">
-                        <a th:href="@{/student/course-selection/my-courses}" class="btn btn-outline-primary">
-                            <i class="fas fa-eye me-2"></i>查看全部课程
-                        </a>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-md-4">
-                <!-- 快速操作 -->
-                <div class="quick-actions mb-4">
-                    <h4 class="section-title">
-                        <i class="fas fa-bolt me-2"></i>快速操作
+                        <i class="fas fa-bolt me-2"></i>学生功能
                     </h4>
                     <a th:href="@{/student/course-selection}" class="action-btn select">
                         <i class="fas fa-plus-circle me-2"></i>选择课程
@@ -346,31 +240,6 @@
                     <a href="#" class="action-btn schedule">
                         <i class="fas fa-calendar-alt me-2"></i>课程表
                     </a>
-                </div>
-                
-                <!-- 学期信息 -->
-                <div class="quick-actions">
-                    <h4 class="section-title">
-                        <i class="fas fa-info-circle me-2"></i>学期信息
-                    </h4>
-                    <div class="mb-3">
-                        <small class="text-muted">当前学期</small>
-                        <div class="fw-bold">2024年春季学期</div>
-                    </div>
-                    <div class="mb-3">
-                        <small class="text-muted">选课状态</small>
-                        <div class="fw-bold text-success">
-                            <i class="fas fa-circle me-1"></i>选课进行中
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <small class="text-muted">选课截止时间</small>
-                        <div class="fw-bold text-warning">2024-03-15 23:59</div>
-                    </div>
-                    <div>
-                        <small class="text-muted">最后登录</small>
-                        <div class="fw-bold" th:text="${user.lastLoginTime != null ? #temporals.format(user.lastLoginTime, 'yyyy-MM-dd HH:mm') : '首次登录'}">2024-01-15 09:30</div>
-                    </div>
                 </div>
             </div>
         </div>
